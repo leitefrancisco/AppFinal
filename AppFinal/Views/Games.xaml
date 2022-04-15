@@ -15,8 +15,8 @@
                 BackgroundColor="Transparent"
                 BorderColor="Green"
                 BorderWidth="1.5"
-                CornerRadius="50">
-                <!--Clicked = "Open_Game"-->
+                CornerRadius="50"
+                Clicked = "Open_Game">
                 
             </Button>
 

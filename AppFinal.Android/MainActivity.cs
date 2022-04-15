@@ -8,7 +8,7 @@ using Android.OS;
 namespace AppFinal.Droid
 {
     [Activity(Label = "AppFinal", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
-    [Android.Runtime.Register("android/content/pm/PackageManager", DoNotGenerateAcw = true)]
+    // [Android.Runtime.Register("android/content/pm/PackageManager", DoNotGenerateAcw = true)]
 
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {

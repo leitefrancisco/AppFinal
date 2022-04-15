@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AppFinal.Interfaces;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration;
 using Xamarin.Forms.Xaml;
@@ -19,13 +20,17 @@ namespace AppFinal.Views
 
         private void Open_Game(object sender, EventArgs e)
         {
+            var gameName = "com.DefaultCompany.com.unity.template.mobile2D";
+
+            DependencyService.Get<IOpenGame>().OpenGame(gameName);
+
             //string packageName = "com.DefaultCompany.com.unity.template.mobile2D";
             //OpenAppOrStore(packageName);
             //You need to change your app package address which you want to open with button. Example: "com.microsoft.office.officelens"
-            //Intent intent = new Intent();
-            //intent.SetComponent(new ComponentName("com.DefaultCompany.com", "com.DefaultCompany.com.unity.template.mobile2D"));
-            //Android.App.Application.Context.StartActivity(intent);
-            
+            // Intent intent = new Intent();
+            // intent.SetComponent(new ComponentName("com.DefaultCompany.com", "com.DefaultCompany.com.unity.template.mobile2D"));
+            // Android.App.Application.Context.StartActivity(intent);
+
 
         }
         //public void OpenAppOrStore(string packageName)
