@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using AppFinal.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -17,6 +18,101 @@ namespace AppFinal.DB.AccessClasses
         public UserDbAccess()
         {
             this.CollectionName = "users";
+        }
+
+        /// <summary>
+        /// User InsertOne(User user, string password) to create a new user
+        /// </summary>
+        [Obsolete("Don't use this method when creating a new user, use the method 'InsertOne(User user, string password)' to hash and salt the user's password", true)]
+        public new bool InsertOne(User user)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Create a new user document
+        /// </summary>
+        /// <param name="user">user to be created</param>
+        /// <param name="password">plain text password to be hashed and salted</param>
+        /// <returns>success of creation</returns>
+        public bool InsertOne(User user, string password)
+        {
+            var salt = GenerateRandomSalt();
+            Console.WriteLine(Convert.ToBase64String(salt));
+
+            var hashed = new Rfc2898DeriveBytes(password, salt).GetBytes(64);
+            Console.WriteLine(Convert.ToBase64String(hashed));
+
+            var bson = user.GetBsonDocument();
+            bson.Add(new BsonElement("password", hashed));
+            bson.Add(new BsonElement("salt", salt));
+
+            return Db.InsertOne(this.CollectionName, bson);
+        }
+
+        /// <summary>
+        /// Generate a random salt
+        /// </summary>
+        /// <returns>random salt as byte array</returns>
+        /// <source>https://stackoverflow.com/questions/7272771/encrypting-the-password-using-salt-in-c-sharp</source>
+        public static byte[] GenerateRandomSalt()
+        {
+            var rng = new RNGCryptoServiceProvider();
+            var bytes = new byte[64];
+            rng.GetBytes(bytes);
+            return bytes;
+        }
+
+        /// <summary>
+        /// Get password and salt from a user from the DB
+        /// </summary>
+        /// <param name="email">user email address</param>
+        /// <returns>dictionary keys: salt, pass. Values: byte arrays</returns>
+        public Dictionary<string, byte[]> GetHashedPasswordAndSalt(string email)
+        {
+            var dict = new Dictionary<string, byte[]>();
+            var filter = Builders<BsonDocument>.Filter.Eq("email", email);
+            var bson = Db.FindOne(this.CollectionName, filter);
+            dict.Add("salt", bson["salt"].AsByteArray);
+            dict.Add("pass", bson["password"].AsByteArray);
+
+            return dict;
+        }
+
+        /// <summary>
+        /// Check credentials against DB
+        /// </summary>
+        /// <param name="email">user email</param>
+        /// <param name="password">user plain text password</param>
+        /// <returns>the user if log in is correct and null if it isn't</returns>
+        public User Login(string email, string password)
+        {
+            var user = Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("email", email));
+            var passAndHash = GetHashedPasswordAndSalt(email);
+            var checkHash = new Rfc2898DeriveBytes(password, passAndHash["salt"]).GetBytes(64);
+
+            return Convert.ToBase64String(checkHash).Equals(Convert.ToBase64String(passAndHash["pass"])) ? GetObjectFromBsonDocument(user) : null;
+
+        }
+
+        /// <summary>
+        /// Change a user's password
+        /// </summary>
+        /// <param name="userId">user id</param>
+        /// <param name="email">user email address</param>
+        /// <param name="oldPassword">current password</param>
+        /// <param name="newPassword">new password</param>
+        /// <returns>invalid credentials: 0, update error: 1, success: 2</returns>
+        public int UpdatePassword(string userId, string email, string oldPassword, string newPassword)
+        {
+            if (Login(email, oldPassword) == null) return 0;
+
+            var salt = GenerateRandomSalt();
+            var hashed = new Rfc2898DeriveBytes(newPassword, salt).GetBytes(64);
+
+            var update = Builders<BsonDocument>.Update.Set("salt", salt).Set("password", hashed);
+
+            return Db.UpdateOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(userId)), update) ? 2 : 1;
         }
 
         /// <summary>

@@ -294,6 +294,29 @@ namespace AppFinal.Models
             return MessageDbAccess.GetUserUnreadMessages(this.id);
         }
 
+
+        /// <summary>
+        /// Check user credentials against DB
+        /// </summary>
+        /// <param name="email">user email address</param>
+        /// <param name="password">user password</param>
+        /// <returns>user if login is correct and null if it isn't</returns>
+        public static User Login(string email, string password)
+        {
+            return DbAccess.Login(email, password);
+        }
+
+        /// <summary>
+        /// Change a user's password
+        /// </summary>
+        /// <param name="oldPassword">current password</param>
+        /// <param name="newPassword">new password</param>
+        /// <returns>0: invalid password, 1: error in the update, 2: successful update</returns>
+        public int UpdatePassword(string oldPassword, string newPassword)
+        {
+            return DbAccess.UpdatePassword(this.id, this.email, oldPassword, newPassword);
+        }
+
         /// <summary>
         /// Update document in DB
         /// </summary>
