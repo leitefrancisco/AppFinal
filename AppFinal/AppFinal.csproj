@@ -15,6 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UserAccess\**" />
+    <EmbeddedResource Remove="UserAccess\**" />
+    <None Remove="UserAccess\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="2.15.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401" />  
@@ -40,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UserAccess\" />
+    <Folder Include="DB\AccessClasses\" />
+    <Folder Include="DB\Source\" />
   </ItemGroup>
 </Project>
