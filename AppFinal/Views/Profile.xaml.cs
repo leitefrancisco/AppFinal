@@ -15,6 +15,7 @@ namespace AppFinal.Views
         public Profile()
         {
             InitializeComponent();
+            
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using AppFinal.Services;
-using AppFinal.Views;
+﻿using AppFinal.Views;
 using System;
+using AppFinal.DB.AccessClasses;
+using AppFinal.DB.Source;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,11 +16,8 @@ namespace AppFinal
         {
             InitializeComponent();
 
-            DependencyService.Register<MockDataStore>();
+            DependencyService.Register<UserDbAccess>();
             MainPage = new AppShell();
-
-
-            
         }
 
         protected override void OnStart()

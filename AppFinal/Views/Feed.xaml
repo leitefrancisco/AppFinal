@@ -4,7 +4,10 @@
              x:Class="AppFinal.Views.Feed"
              xmlns:vm="clr-namespace:AppFinal.ViewModels"
              Title= "{Binding Title}">
-             
+    <ContentPage.BindingContext>
+        <vm:FeedViewModel/>
+    </ContentPage.BindingContext>    
+
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
@@ -18,7 +21,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Image Source="indie" BackgroundColor="#White"
+            <Image Source="indie" BackgroundColor="White"
                Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" />
             <Editor Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
                 Placeholder="Save Your Achievements" FontSize="Medium"/>

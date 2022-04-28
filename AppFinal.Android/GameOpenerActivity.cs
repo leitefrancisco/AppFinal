@@ -27,7 +27,7 @@ namespace AppFinal.Droid
 
             // Create your application here
         }
-
+        //check if the game is installed in the phone
         public void OpenGame(string game)
         {
             
@@ -37,12 +37,14 @@ namespace AppFinal.Droid
             if (intent != null)
             {
                 intent.AddFlags(ActivityFlags.NewTask);
+                //starts the package
                 Android.App.Application.Context.StartActivity(intent);
             }
             else
             {
                 intent = new Intent(Intent.ActionView);
                 intent.AddFlags(ActivityFlags.NewTask);
+                //won't work because our game is not in playstore
                 intent.SetData(Android.Net.Uri.Parse($"market://details?id={game}"));
                 Android.App.Application.Context.StartActivity(intent);
             }

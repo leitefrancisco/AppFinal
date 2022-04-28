@@ -37,11 +37,10 @@
         <Tab Title="Friends" Icon="friends.png">
             <ShellContent ContentTemplate="{DataTemplate local:Friends}" />
         </Tab>
-        <!--
         <Tab Title="Profile" Icon="profile.png">
             <ShellContent ContentTemplate="{DataTemplate local:Profile}" />
         </Tab>
-        -->
+        
     </TabBar>
     <ShellContent ContentTemplate="{DataTemplate local:Registration}" />
     

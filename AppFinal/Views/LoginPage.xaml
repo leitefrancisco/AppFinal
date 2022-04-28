@@ -5,18 +5,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="AppFinal.Views.LoginPage"
+             xmlns:vm="clr-namespace:AppFinal.ViewModels"
              BackgroundColor="#055052"
              Shell.FlyoutBehavior="Disabled"
              Shell.NavBarIsVisible="False"
              Shell.TabBarIsVisible="True">
-    
+
+    <ContentPage.BindingContext>
+        <vm:LoginViewModel/>
+    </ContentPage.BindingContext>
+
     <ContentPage.Content>
         <StackLayout Padding="40" VerticalOptions="Center" HorizontalOptions="FillAndExpand">
 
             <Image Source="indie_dark.png" WidthRequest="350"></Image>
 
-            <Entry x:Name="txtUsername" Placeholder="Username" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
-            <Entry x:Name="txtPassword" Placeholder="Password" IsPassword="True" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
+            <Entry x:Name="TxtUsername" Placeholder="Username" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
+            <Entry x:Name="TxtPassword" Placeholder="Password" IsPassword="True" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
             <Button
                 VerticalOptions="Center"
                 Text="Login"

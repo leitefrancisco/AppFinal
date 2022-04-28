@@ -16,6 +16,7 @@ namespace AppFinal
             Routing.RegisterRoute(nameof(Games), typeof(Games));
             Routing.RegisterRoute(nameof(Friends), typeof(Friends));
             Routing.RegisterRoute(nameof(Registration), typeof(Registration));
+            Routing.RegisterRoute(nameof(Profile),typeof(Profile));
         }
 
     }
