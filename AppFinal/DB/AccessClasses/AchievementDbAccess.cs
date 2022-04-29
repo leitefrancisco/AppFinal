@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AppFinal.Models;
+using DataAccess.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -24,10 +26,11 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="name">name of achievement</param>
         /// <returns>Achievement object</returns>
-        public Achievement GetAchievementByName(string name)
+        public async Task<Achievement> GetAchievementByName(string name)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("name", name);
-            return GetObjectFromBsonDocument(Db.FindOne(this.CollectionName, filter));
+            var bson = await Db.FindOne(this.CollectionName, filter.ToString());
+            return GetObjectFromBsonDocument(bson);
 
         }
 

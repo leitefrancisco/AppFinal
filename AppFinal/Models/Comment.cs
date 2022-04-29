@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AppFinal.DB.AccessClasses;
+using DataAccess.Models;
 using MongoDB.Bson;
 
 namespace AppFinal.Models
@@ -67,7 +68,7 @@ namespace AppFinal.Models
                 return null;
             }
         }
-
+        
         /// <summary>
         /// Create Bson Document based on object
         /// </summary>
@@ -157,6 +158,5 @@ namespace AppFinal.Models
 
             return $"{nameof(Id)}: {Id}, {nameof(PostId)}: {PostId}, {nameof(UserId)}: {UserId}, {nameof(Date)}: {Date}, {nameof(Content)}: {Content}, {nameof(Likes)} ({Likes.Count}): {likeString}, {nameof(MediaUrl)}: {MediaUrl}, {nameof(Comments)}({Comments.Count}): {commentString}";
         }
-
     }
 }

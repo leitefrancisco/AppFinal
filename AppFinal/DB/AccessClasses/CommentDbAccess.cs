@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.Models;
+using DataAccess.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -24,13 +26,14 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="postId">id of post to find comments for</param>
         /// <returns>LinkedList of comments for a given post</returns>
-        public LinkedList<Comment> GetPostComments(string postId)
+        public async Task<LinkedList<Comment>> GetPostComments(string postId)
         {
             var comments = new LinkedList<Comment>();
 
-            var filter = Builders<BsonDocument>.Filter.Eq("postId", postId);
-            var bsonComments = Db.FindMany(this.CollectionName, filter);
+            var filter = "{\"postId\": \"" + postId + "\"}";
 
+        var bsonComments = await Db.FindMany(this.CollectionName, filter); 
+            
             foreach (var bsonComment in bsonComments)
             {
                 comments.AddLast(GetCommentFromBsonDocument(bsonComment));

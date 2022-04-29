@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.DB.AccessClasses;
 using MongoDB.Bson;
 
@@ -10,7 +11,6 @@ namespace AppFinal.Models
     /// </summary>
     public class User
     {
-
         public static UserDbAccess DbAccess = new UserDbAccess();
         public static MessageDbAccess MessageDbAccess = new MessageDbAccess();
         public static PostDbAccess PostDbAccess = new PostDbAccess();
@@ -104,10 +104,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>success of update</returns>
-        public bool AcceptRequest(string userId)
+        public async Task<bool> AcceptRequest(string userId)
         {
             this.friends.AddLast(userId);
-            var newFriend = DbAccess.FindOne(userId);
+            var newFriend = await DbAccess.FindOne(userId);
             newFriend.friends.AddLast(this.id);
             newFriend.Update();
             return Update();
@@ -129,9 +129,9 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="userId">user to request friendship for</param>
         /// <returns>success of update</returns>
-        public bool RequestFriendship(string userId)
+        public async Task<bool> RequestFriendship(string userId)
         {
-            var requestFriend = DbAccess.FindOne(userId);
+            var requestFriend = await DbAccess.FindOne(userId);
             requestFriend.friendsRequest.AddLast(this.id);
             return requestFriend.Update();
         }
@@ -152,11 +152,11 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="userId">id of friend to be removed</param>
         /// <returns>success of update</returns>
-        public bool RemoveFriend(string userId)
+        public async Task<bool> RemoveFriend(string userId)
         {
             this.friends.Remove(userId);
-            var removedFriend = DbAccess.FindOne(userId);
-            removedFriend.RemoveFriend(this.id);
+            var removedFriend = await DbAccess.FindOne(userId);
+            await removedFriend.RemoveFriend(this.id);
             removedFriend.Update();
             return Update();
         }
@@ -218,12 +218,13 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="achievementId">id of achievement</param>
         /// <returns>success of update</returns>
-        public bool NewAchievement(string achievementId)
+        public async Task<bool> NewAchievement(string achievementId)
         {
-            var pointsToAdd = new AchievementDbAccess().FindOne(achievementId).achievementPoints;
+            var achievement = await new AchievementDbAccess().FindOne(achievementId);
+            var pointsToAdd = achievement.achievementPoints;
             this.achievements.AddLast(achievementId);
             CheckLevelUp(pointsToAdd);
-
+            
             return Update();
         }
 
@@ -235,7 +236,7 @@ namespace AppFinal.Models
         {
             var gap = 20;
 
-            var upLevel = (int)Math.Floor((double)(pointsToAdd / gap));
+            var upLevel = (int) Math.Floor((double) (pointsToAdd / gap));
 
             var minLevel = this.accountLevel * gap;
             var difference = this.achievementPoints - minLevel;
@@ -248,7 +249,7 @@ namespace AppFinal.Models
             }
             else
             {
-                upLevel = (int)Math.Floor((double)((pointsToAdd + difference) / gap));
+                upLevel = (int) Math.Floor((double) ((pointsToAdd + difference) / gap));
                 for (int i = 0; i < upLevel; i++)
                 {
                     this.AccountLevelUp();
@@ -262,59 +263,36 @@ namespace AppFinal.Models
         /// Get all messages sent and received by user
         /// </summary>
         /// <returns>LinkedList with all messages</returns>
-        public LinkedList<Message> GetAllMessages()
+        public async Task<LinkedList<Message>> GetAllMessages()
         {
-            return MessageDbAccess.GetUserMessages(this.id);
+            return await MessageDbAccess.GetUserMessages(this.id);
         }
 
         /// <summary>
         /// Get all sent messages by user
         /// </summary>
         /// <returns>LinkedList with sent messages</returns>
-        public LinkedList<Message> GetSentMessages()
+        public async Task<LinkedList<Message>> GetSentMessages()
         {
-            return MessageDbAccess.GetUserSentMessages(this.id);
+            return await MessageDbAccess.GetUserSentMessages(this.id);
         }
 
         /// <summary>
         /// Get all received messages by user
         /// </summary>
         /// <returns>LinkedList with received messages</returns>
-        public LinkedList<Message> GetReceivedMessages()
+        public async Task<LinkedList<Message>> GetReceivedMessages()
         {
-            return MessageDbAccess.GetUserReceivedMessages(this.id);
+            return await MessageDbAccess.GetUserReceivedMessages(this.id);
         }
 
         /// <summary>
         /// Get all unread messages by user
         /// </summary>
         /// <returns>LinkedList with unread messages</returns>
-        public LinkedList<Message> GetUnreadMessages()
+        public async Task<LinkedList<Message>> GetUnreadMessages()
         {
-            return MessageDbAccess.GetUserUnreadMessages(this.id);
-        }
-
-
-        /// <summary>
-        /// Check user credentials against DB
-        /// </summary>
-        /// <param name="email">user email address</param>
-        /// <param name="password">user password</param>
-        /// <returns>user if login is correct and null if it isn't</returns>
-        public static User Login(string email, string password)
-        {
-            return DbAccess.Login(email, password);
-        }
-
-        /// <summary>
-        /// Change a user's password
-        /// </summary>
-        /// <param name="oldPassword">current password</param>
-        /// <param name="newPassword">new password</param>
-        /// <returns>0: invalid password, 1: error in the update, 2: successful update</returns>
-        public int UpdatePassword(string oldPassword, string newPassword)
-        {
-            return DbAccess.UpdatePassword(this.id, this.email, oldPassword, newPassword);
+            return await MessageDbAccess.GetUserUnreadMessages(this.id);
         }
 
         /// <summary>
@@ -332,6 +310,28 @@ namespace AppFinal.Models
                 Console.WriteLine(e);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Check user credentials against DB
+        /// </summary>
+        /// <param name="email">user email address</param>
+        /// <param name="password">user password</param>
+        /// <returns>user if login is correct and null if it isn't</returns>
+        public static async Task<User> Login(string email, string password)
+        {
+            return await DbAccess.Login(email, password);
+        }
+
+        /// <summary>
+        /// Change a user's password
+        /// </summary>
+        /// <param name="oldPassword">current password</param>
+        /// <param name="newPassword">new password</param>
+        /// <returns>0: invalid password, 1: error in the update, 2: successful update</returns>
+        public int UpdatePassword(string oldPassword, string newPassword)
+        {
+            return DbAccess.UpdatePassword(this.id, this.email, oldPassword, newPassword);
         }
 
         public override string ToString()
@@ -362,7 +362,7 @@ namespace AppFinal.Models
             {
                 requestsArray.Add(req);
             }
-
+            
             var bsonDoc = new BsonDocument()
             {
                 {"_id", new ObjectId(this.id)},

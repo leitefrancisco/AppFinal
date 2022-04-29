@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.Models;
+using DataAccess.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -24,11 +26,10 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="userId">id of user collection</param>
         /// <returns>LinkedList of all messages that have been sent and received</returns>
-        public LinkedList<Message> GetUserMessages(string userId)
+        public async Task<LinkedList<Message>> GetUserMessages(string userId)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("by", userId);
-            filter |= Builders<BsonDocument>.Filter.Eq("to", userId);
-            var messagesBsonDocument = Db.FindMany(this.CollectionName, filter);
+            var filter = "{$or: {\"by\": \"" + userId + "\", \"to\": \"" + userId + "\"}";
+            var messagesBsonDocument = await Db.FindMany(this.CollectionName, filter);
 
             return GetLinkedListFromBsonList(messagesBsonDocument);
         }
@@ -38,10 +39,10 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="userId">id of user collection</param>
         /// <returns>LinkedList of all messages that have been sent</returns>
-        public LinkedList<Message> GetUserSentMessages(string userId)
+        public async Task<LinkedList<Message>> GetUserSentMessages(string userId)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("by", userId);
-            var messagesBsonDocument = Db.FindMany(this.CollectionName, filter);
+            var filter = "{\"by\": \"" + userId + "\"}";
+            var messagesBsonDocument = await Db.FindMany(this.CollectionName, filter);
 
             return GetLinkedListFromBsonList(messagesBsonDocument);
         }
@@ -51,10 +52,10 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="userId">id of user document</param>
         /// <returns>LinkedList of all messages that have been received</returns>
-        public LinkedList<Message> GetUserReceivedMessages(string userId)
+        public async Task<LinkedList<Message>> GetUserReceivedMessages(string userId)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("to", userId);
-            var messagesBsonDocument = Db.FindMany(this.CollectionName, filter);
+            var filter = "{\"to\": \"" + userId + "\"}";
+            var messagesBsonDocument = await Db.FindMany(this.CollectionName, filter);
 
             return GetLinkedListFromBsonList(messagesBsonDocument);
         }
@@ -64,14 +65,10 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="userId">d of user document</param>
         /// <returns>LinkedList of all unread messages that have been received or are to be received</returns>
-        public LinkedList<Message> GetUserUnreadMessages(string userId)
+        public async Task<LinkedList<Message>> GetUserUnreadMessages(string userId)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("to", userId);
-            var secondFilter = Builders<BsonDocument>.Filter.Eq("messageStatus", MessageStatusGetter.GetMessageStatus(MessageStatus.SENT));
-            secondFilter |= Builders<BsonDocument>.Filter.Eq("messageStatus",
-                MessageStatusGetter.GetMessageStatus(MessageStatus.RECEIVED));
-            filter &= secondFilter;
-            var messagesBsonDocument = Db.FindMany(this.CollectionName, filter);
+            var filter = "{\"to\": \"" + userId + "\", $or: {\"messageStatus\": \"" + MessageStatusGetter.GetMessageStatus(MessageStatus.SENT) + "\", \"messageStatus\": \"" + MessageStatusGetter.GetMessageStatus(MessageStatus.RECEIVED) + "\"}}";
+            var messagesBsonDocument = await Db.FindMany(this.CollectionName, filter);
 
             return GetLinkedListFromBsonList(messagesBsonDocument);
         }

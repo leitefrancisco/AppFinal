@@ -1,7 +1,4 @@
-﻿using AppFinal.ViewModels;
-using AppFinal.Views;
-using System;
-using System.Collections.Generic;
+﻿using AppFinal.Views;
 using Xamarin.Forms;
 
 namespace AppFinal

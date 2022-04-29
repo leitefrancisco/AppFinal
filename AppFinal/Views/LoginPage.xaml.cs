@@ -1,15 +1,12 @@
 ﻿using AppFinal.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AppFinal.DB.AccessClasses;
 using AppFinal.Interfaces;
 using AppFinal.Models;
 using Refit;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+
 
 namespace AppFinal.Views
 {
@@ -36,23 +33,14 @@ namespace AppFinal.Views
             }
             else
             {
-                //var authAPI = RestService.For<IAPI>("http://35.204.176.180:8080");
-                //User user = new User
-                //{
-                //    Email = txtEmail.Text.ToString(),
-                //    Password = txtPassword.Text.ToString()
-                //};
 
-                //Dictionary<string, string> data = new Dictionary<string, string>();
-                //data.Add("email", user.Email);
-                //data.Add("password", user.Password);
-                //var result = await authAPI.SignIn(data);
+                var user =await User.Login(TxtUsername.Text, TxtPassword.Text);
+                if (user != null)
+                {
+                    Console.WriteLine(user);
+                    await Shell.Current.GoToAsync("Feed");
+                }
 
-                //var stringResult = result.ToString();
-                //if (stringResult.Contains("Login Successful"))
-                //{
-                await Shell.Current.GoToAsync("Feed");
-                //}
             }
 
            
@@ -62,5 +50,7 @@ namespace AppFinal.Views
         {
             await Shell.Current.GoToAsync( "Registration");
         }
+
+        
     }
 }

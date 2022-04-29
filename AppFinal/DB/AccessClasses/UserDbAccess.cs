@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using AppFinal.Models;
+using DataAccess.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -68,11 +70,11 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="email">user email address</param>
         /// <returns>dictionary keys: salt, pass. Values: byte arrays</returns>
-        public Dictionary<string, byte[]> GetHashedPasswordAndSalt(string email)
+        public async Task<Dictionary<string, byte[]>> GetHashedPasswordAndSalt(string email)
         {
             var dict = new Dictionary<string, byte[]>();
             var filter = Builders<BsonDocument>.Filter.Eq("email", email);
-            var bson = Db.FindOne(this.CollectionName, filter);
+            var bson = await Db.FindOne(this.CollectionName, filter.ToString());
             dict.Add("salt", bson["salt"].AsByteArray);
             dict.Add("pass", bson["password"].AsByteArray);
 
@@ -85,10 +87,10 @@ namespace AppFinal.DB.AccessClasses
         /// <param name="email">user email</param>
         /// <param name="password">user plain text password</param>
         /// <returns>the user if log in is correct and null if it isn't</returns>
-        public User Login(string email, string password)
+        public async Task<User> Login(string email, string password)
         {
-            var user = Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("email", email));
-            var passAndHash = GetHashedPasswordAndSalt(email);
+            var user = await Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("email", email).ToString());
+            var passAndHash = await GetHashedPasswordAndSalt(email);
             var checkHash = new Rfc2898DeriveBytes(password, passAndHash["salt"]).GetBytes(64);
 
             return Convert.ToBase64String(checkHash).Equals(Convert.ToBase64String(passAndHash["pass"])) ? GetObjectFromBsonDocument(user) : null;
@@ -109,23 +111,29 @@ namespace AppFinal.DB.AccessClasses
 
             var salt = GenerateRandomSalt();
             var hashed = new Rfc2898DeriveBytes(newPassword, salt).GetBytes(64);
-
+            
             var update = Builders<BsonDocument>.Update.Set("salt", salt).Set("password", hashed);
 
             return Db.UpdateOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(userId)), update) ? 2 : 1;
         }
+
 
         /// <summary>
         /// Get all friends of a given user
         /// </summary>
         /// <param name="userId">id of the user to find friends of</param>
         /// <returns>LinkedList with all friends of a given user</returns>
-        public LinkedList<User> GetUserFriends(string userId)
+        public async Task<LinkedList<User>> GetUserFriends(string userId)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("friends", userId);
-            var friendsBsonDocument = Db.FindMany(this.CollectionName, filter);
-
+            var filter = "{\"friends\": \"" + userId + "\"}";
+            var friendsBsonDocument = await Db.FindMany(this.CollectionName, filter);
+            
             return GetLinkedListFromBsonList(friendsBsonDocument);
+        }
+
+        public User GetUserFromBson(BsonDocument bson)
+        {
+            return GetObjectFromBsonDocument(bson);
         }
 
         protected override User GetObjectFromBsonDocument(BsonDocument document)
@@ -141,7 +149,7 @@ namespace AppFinal.DB.AccessClasses
                 var region = document["region"].AsString;
                 var accountLevel = document["accountLevel"].AsInt32;
                 var achievementPoints = document["totalAchievementPoints"].AsInt32;
-
+                
                 var friends = new LinkedList<string>();
                 foreach (var friend in document["friends"].AsBsonArray)
                 {

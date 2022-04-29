@@ -1,10 +1,5 @@
-﻿using AppFinal.Views;
-using System;
-using AppFinal.DB.AccessClasses;
-using AppFinal.DB.Source;
+﻿using AppFinal.DB.AccessClasses;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-
 
 
 namespace AppFinal

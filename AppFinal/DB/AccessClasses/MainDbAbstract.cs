@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.DB.Source;
 using AppFinal.Interfaces;
 using MongoDB.Bson;
@@ -7,7 +8,6 @@ using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
-
     /// <summary>
     /// Abstract class implementing Main DB connection interface
     /// </summary>
@@ -19,33 +19,33 @@ namespace AppFinal.DB.AccessClasses
 
         // Each access class for a collection has its own collection name
         protected string CollectionName { get; set; }
-
+        
         public bool DeleteOne(string objId)
         {
             return Db.DeleteOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(objId)));
         }
 
-        public LinkedList<T> FindMany()
+        public async Task<LinkedList<T>> FindMany()
         {
-            var bsonList = Db.FindAll(this.CollectionName);
+            var bsonList = await Db.FindAll(this.CollectionName);
             return GetLinkedListFromBsonList(bsonList);
         }
 
-        public LinkedList<T> FindMany(Dictionary<string, string> filters)
+        public async Task<LinkedList<T>> FindMany(Dictionary<string, string> filters)
         {
-            var objectsBsonDocument = Db.FindMany(this.CollectionName, GetFilterFromDictionary(filters));
+            var objectsBsonDocument = await Db.FindMany(this.CollectionName, GetFilterFromDictionary(filters));
             return GetLinkedListFromBsonList(objectsBsonDocument);
         }
-
-        public T FindOne(string objId)
+        
+        public async Task<T> FindOne(string objId)
         {
-            var objectBson = Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(objId)));
+            var objectBson = await Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(objId)).ToString());
             return GetObjectFromBsonDocument(objectBson);
         }
 
-        public T FindOne(Dictionary<string, string> filters)
+        public async Task<T> FindOne(Dictionary<string, string> filters)
         {
-            var objBson = Db.FindOne(this.CollectionName, GetFilterFromDictionary(filters));
+            var objBson = await Db.FindOne(this.CollectionName, GetFilterFromDictionary(filters).ToString());
             return GetObjectFromBsonDocument(objBson);
         }
 
@@ -54,18 +54,17 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="filters">Dictionary with field name as key and value to be checked as value</param>
         /// <returns>FilterDefinition with the values in the filters</returns>
-        protected FilterDefinition<BsonDocument> GetFilterFromDictionary(Dictionary<string, string> filters)
+        protected string GetFilterFromDictionary(Dictionary<string, string> filters)
         {
-            var builder = Builders<BsonDocument>.Filter;
-            FilterDefinition<BsonDocument> filter = builder.Empty;
+            var filter = "{";
             foreach (var keyValuePair in filters)
             {
                 Console.WriteLine(keyValuePair);
-                var lineFilter = builder.Eq(keyValuePair.Key, keyValuePair.Value);
-                filter &= lineFilter;
+                var lineFilter = "\"" + keyValuePair.Key + "\": \"" + keyValuePair.Value + "\",";
+                filter += lineFilter;
             }
 
-            return filter;
+            return filter + "}";
 
         }
 

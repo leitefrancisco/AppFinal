@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.DB.AccessClasses;
 using MongoDB.Bson;
 
@@ -10,7 +11,6 @@ namespace AppFinal.Models
     /// </summary>
     public class Post
     {
-
         protected static PostDbAccess DbAccess = new PostDbAccess();
         private static readonly CommentDbAccess CommentAccess = new CommentDbAccess();
 
@@ -91,9 +91,9 @@ namespace AppFinal.Models
         /// Get LinkedList of Comment objects from comment ids
         /// </summary>
         /// <returns>LinkedList of Comment objects</returns>
-        public LinkedList<Comment> GetComments()
+        public async Task<LinkedList<Comment>> GetComments()
         {
-            return CommentAccess.GetPostComments(this.Id);
+            return await CommentAccess.GetPostComments(this.Id);
         }
 
         /// <summary>

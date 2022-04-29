@@ -1,36 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AppFinal.Interfaces
 {
     public interface IMainDbInterface<T> where T : class
     {
-
         /// <summary>
         /// Get all documents in a given collection
         /// </summary>
         /// <returns>LinkedList of documents as objects of their class</returns>
-        public LinkedList<T> FindMany();
+        public Task<LinkedList<T>> FindMany();
 
         /// <summary>
         /// Get all documents in a given collection that correspond to the filters
         /// </summary>
         /// <param name="filters">Dictionary with field name as key and value to be checked as value</param>
         /// <returns>LinkedList of documents that correspond to filters as objects of their class</returns>
-        public LinkedList<T> FindMany(Dictionary<string, string> filters);
+        public Task<LinkedList<T>> FindMany(Dictionary<string, string> filters);
 
         /// <summary>
         /// Get a document
         /// </summary>
         /// <param name="objId">id of document as string</param>
         /// <returns>Single object of <c>T</c> </returns>
-        public T FindOne(string objId);
+        public Task<T> FindOne(string objId);
 
         /// <summary>
         /// Get a document based on filters
         /// </summary>
         /// <param name="filters">Dictionary with field name as key and value to be checked as value</param>
         /// <returns>Single object</returns>
-        public T FindOne(Dictionary<string, string> filters);
+        public Task<T> FindOne(Dictionary<string, string> filters);
 
         /// <summary>
         /// Updates a document in the DB with its current attributes
@@ -53,6 +53,6 @@ namespace AppFinal.Interfaces
         /// <param name="obj">Object to create document in DB for</param>
         /// <returns>Success of insertion</returns>
         public bool InsertOne(T obj);
-
+        
     }
 }

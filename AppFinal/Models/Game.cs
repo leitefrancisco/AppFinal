@@ -53,6 +53,5 @@ namespace AppFinal.Models
         {
             return $"{nameof(id)}: {id}, {nameof(name)}: {name}, {nameof(thumbnailUrl)}: {thumbnailUrl}, {nameof(description)}: {description}, {nameof(path)}: {path}";
         }
-
     }
 }

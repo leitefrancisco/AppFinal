@@ -82,6 +82,5 @@ namespace AppFinal.Models
         {
             return $"{nameof(id)}: {id}, {nameof(gameId)}: {gameId}, {nameof(date)}: {date}, {nameof(userIds)}: {userIds.Count}, {nameof(winnerId)}: {winnerId}";
         }
-
     }
 }

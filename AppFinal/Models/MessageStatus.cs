@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AppFinal.Models
+namespace DataAccess.Models
 {
     /// <summary>
     /// Message Status Enumerator
@@ -12,8 +12,8 @@ namespace AppFinal.Models
         RECEIVED,
         READ,
         LIKED
+            
     }
-
 
     /// <summary>
     /// Getter for message status

@@ -1,5 +1,6 @@
 ﻿using System;
 using AppFinal.DB.AccessClasses;
+using DataAccess.Models;
 using MongoDB.Bson;
 
 namespace AppFinal.Models

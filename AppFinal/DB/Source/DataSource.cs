@@ -1,30 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using AppFinal.DB.AccessClasses;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace AppFinal.DB.Source
 {
-    // TODO HIDE THE CLASS
     /// <summary>
-    /// Data Source class
+    /// Data Source to be hashed and hidden
     /// </summary>
     public class DataSource
     {
         private static readonly DataSource Instance = new DataSource();
 
-        private readonly MongoClient _client;
-        private readonly IMongoDatabase _db;
+        private readonly HttpClient _httpClient;
+        private readonly string path = "http://35.204.176.180:8080/";
 
         /// <summary>
         /// Instantiate the data source
         /// </summary>
         private DataSource()
         {
-            var settings = MongoClientSettings.FromConnectionString("mongodb+srv://atgp-mongodb:podepagurizada123@atgp-mongodb.xl10x.mongodb.net/ATGPmongodb?retryWrites=true&w=majority");
-            settings.ServerApi = new ServerApi(ServerApiVersion.V1);
-            this._client = new MongoClient(settings);
-            this._db = this._client.GetDatabase("ATGPmongodb");
+            this._httpClient = new HttpClient();
         }
 
         /// <summary>
@@ -33,16 +35,17 @@ namespace AppFinal.DB.Source
         /// <returns>success of connection</returns>
         public bool CheckConnection()
         {
-            try
-            {
-                this._db.RunCommandAsync((Command<BsonDocument>)"{ping: 1}").Wait();
-                ShowCollections();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return false;
+            //try
+            //{
+            //    this._httpClient.RunCommandAsync((Command<BsonDocument>)"{ping: 1}").Wait();
+            //    ShowCollections();
+            //    return true;
+            //}
+            //catch (Exception)
+            //{
+            //    return false;
+            //}
         }
 
         /// <summary>
@@ -50,10 +53,10 @@ namespace AppFinal.DB.Source
         /// </summary>
         private void ShowCollections()
         {
-            foreach (var collection in this._db.ListCollectionNames().ToList())
-            {
-                Console.WriteLine(collection);
-            }
+            //foreach (var collection in this._httpClient.ListCollectionNames().ToList())
+            //{
+            //    Console.WriteLine(collection);
+            //}
         }
 
         /// <summary>
@@ -61,9 +64,44 @@ namespace AppFinal.DB.Source
         /// </summary>
         /// <param name="collection">collection name</param>
         /// <returns>List of BsonDocuments</returns>
-        public List<BsonDocument> FindAll(string collection)
+        public async Task<List<BsonDocument>> FindAll(string collection)
         {
-            return this._db.GetCollection<BsonDocument>(collection).Find(new BsonDocument()).ToList();
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+            //request.Content = new StringContent("{\"region\": \"Taubate\"}", Encoding.UTF8, "application/json");
+
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            JsonDocument json = JsonDocument.Parse(response);
+
+            var array = BsonSerializer.Deserialize<BsonArray>(response);
+            List<BsonDocument> documents = new List<BsonDocument>();
+            foreach (var r in array)
+            {
+                documents.Add(r.AsBsonDocument);
+            }
+            return documents;
+            
+        }
+
+        public async Task Test(string collection)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+            request.Content = new StringContent("{\"region\": \"Taubate\"}", Encoding.UTF8, "application/json");
+
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            JsonDocument json = JsonDocument.Parse(response);
+
+            var array = BsonSerializer.Deserialize<BsonArray>(response);
+            Console.WriteLine("Results");
+            foreach (var r in array)
+            {
+                var user = new UserDbAccess().GetUserFromBson(r.AsBsonDocument);
+                Console.WriteLine("User: " + user);
+            }
+
         }
 
         /// <summary>
@@ -72,36 +110,25 @@ namespace AppFinal.DB.Source
         /// <param name="collection">collection name</param>
         /// <param name="filter">FilterDefinition</param>
         /// <returns>List of BsonDocument that match the filter</returns>
-        public List<BsonDocument> FindMany(string collection, FilterDefinition<BsonDocument> filter)
+        public async Task<List<BsonDocument>> FindMany(string collection, string filter)
         {
-            return this._db.GetCollection<BsonDocument>(collection).Find(filter).ToList();
-        }
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+            request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
 
-        /// <summary>
-        /// Find the limit of documents after skipping some documents that match the given filter
-        /// </summary>
-        /// <param name="collection">collection name</param>
-        /// <param name="filter">FilterDefinition</param>
-        /// <param name="skip">number of documents to be skipped</param>
-        /// <param name="limit">limit of documents to be retrieved</param>
-        /// <returns>List of BsonDocument</returns>
-        public List<BsonDocument> FindMany(string collection, FilterDefinition<BsonDocument> filter, int skip, int limit)
-        {
-            return this._db.GetCollection<BsonDocument>(collection).Find(filter).Skip(skip).Limit(limit).ToList();
-        }
+            var responseMessage = await this._httpClient.SendAsync(request);
 
-        /// <summary>
-        /// Find all documents from a collection
-        /// </summary>
-        /// <param name="collection">collection name</param>
-        /// <param name="skip">number of documents to be skipped</param>
-        /// <param name="limit">limit of documents to be retrieved</param>
-        /// <returns>List of BsonDocument</returns>
-        public List<BsonDocument> FindAll(string collection, int skip, int limit)
-        {
-            return this._db.GetCollection<BsonDocument>(collection).Find(new BsonDocument()).Skip(skip).Limit(limit)
-                .ToList();
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            JsonDocument json = JsonDocument.Parse(response);
+
+            var array = BsonSerializer.Deserialize<BsonArray>(response);
+            List<BsonDocument> documents = new List<BsonDocument>();
+            foreach (var r in array)
+            {
+                documents.Add(r.AsBsonDocument);
+            }
+            return documents;
         }
+        
 
         /// <summary>
         /// Finds one document in collection using a filter definition
@@ -109,9 +136,18 @@ namespace AppFinal.DB.Source
         /// <param name="collection">collection name</param>
         /// <param name="filter">FilterDefinition</param>
         /// <returns>single BsonDocument</returns>
-        public BsonDocument FindOne(string collection, FilterDefinition<BsonDocument> filter)
+        public async Task<BsonDocument> FindOne(string collection, string filter)
         {
-            return this._db.GetCollection<BsonDocument>(collection).Find(filter).FirstOrDefault();
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+            request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
+
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            JsonDocument json = JsonDocument.Parse(response);
+
+            var obj = BsonSerializer.Deserialize<BsonArray>(response);
+            return obj.ToList()[0].AsBsonDocument;
         }
 
         /// <summary>
@@ -122,16 +158,17 @@ namespace AppFinal.DB.Source
         /// <returns>success of insertion</returns>
         public bool InsertOne(string collection, BsonDocument document)
         {
-            try
-            {
-                this._db.GetCollection<BsonDocument>(collection).InsertOne(document);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
+            return false;
+            //try
+            //{
+            //    this._httpClient.GetCollection<BsonDocument>(collection).InsertOne(document);
+            //    return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //    return false;
+            //}
         }
 
         /// <summary>
@@ -142,16 +179,17 @@ namespace AppFinal.DB.Source
         /// <returns>success of deletion</returns>
         public bool DeleteOne(string collection, FilterDefinition<BsonDocument> filter)
         {
-            try
-            {
-                this._db.GetCollection<BsonDocument>(collection).DeleteOne(filter);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
+            return false;
+            //try
+            //{
+            //    this._httpClient.GetCollection<BsonDocument>(collection).DeleteOne(filter);
+            //    return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //    return false;
+            //}
         }
 
         /// <summary>
@@ -163,16 +201,17 @@ namespace AppFinal.DB.Source
         /// <returns>success of update</returns>
         public bool UpdateOne(string collection, FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
         {
-            try
-            {
-                var res = this._db.GetCollection<BsonDocument>(collection).UpdateOne(filter, update);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
+            return false;
+            //try
+            //{
+            //    var res = this._httpClient.GetCollection<BsonDocument>(collection).UpdateOne(filter, update);
+            //    return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //    return false;
+            //}
         }
 
         /// <summary>
@@ -184,12 +223,12 @@ namespace AppFinal.DB.Source
             return Instance;
         }
 
-        /// <summary>
-        /// Disposes of the current connection
-        /// </summary>
-        public void DisposeConnection()
-        {
-            this._db.Client.Cluster.Dispose();
-        }
+        ///// <summary>
+        ///// Disposes of the current connection
+        ///// </summary>
+        //public void DisposeConnection()
+        //{
+        //    this._httpClient.Client.Cluster.Dispose();
+        //}
     }
 }

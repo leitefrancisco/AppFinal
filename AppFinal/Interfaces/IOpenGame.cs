@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AppFinal.Interfaces
+﻿namespace AppFinal.Interfaces
 {
     public interface IOpenGame
     {

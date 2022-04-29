@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AppFinal.Models;
+using DataAccess.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -47,7 +48,7 @@ namespace AppFinal.DB.AccessClasses
 
                 return new Post(postId, userId, date, content, likes, mediaUrl, comments);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

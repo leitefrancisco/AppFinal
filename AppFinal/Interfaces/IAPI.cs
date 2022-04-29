@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Refit;
 
@@ -13,5 +11,10 @@ namespace AppFinal.Interfaces
 
         [Post("/register")]
         Task<string> Register([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, string> data);
+
+        [Get("/users")]
+        Task<string> FindMany([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string,string> data);
+
+        
     }
 }

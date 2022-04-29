@@ -13,7 +13,6 @@ namespace AppFinal.Models
         GLOBAL
     }
 
-
     /// <summary>
     /// Getter for region
     /// </summary>
@@ -26,7 +25,7 @@ namespace AppFinal.Models
         public static LinkedList<string> GetRegions()
         {
             LinkedList<string> regions = new LinkedList<string>();
-            foreach (var region in (Region[])Enum.GetValues(typeof(Region)))
+            foreach (var region in (Region[]) Enum.GetValues(typeof(Region)))
             {
                 regions.AddLast(GetName(region));
             }

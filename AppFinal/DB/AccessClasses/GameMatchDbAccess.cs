@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.Models;
+using DataAccess.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -24,11 +26,11 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="userId">id of user to find game matches of</param>
         /// <returns>LinkedList of game matches from user</returns>
-        public LinkedList<GameMatch> GetUserGameMatches(string userId)
+        public async Task<LinkedList<GameMatch>> GetUserGameMatches(string userId)
         {
             LinkedList<GameMatch> gms = new LinkedList<GameMatch>();
-            var filter = Builders<BsonDocument>.Filter.Eq("userIds", userId);
-            var gmsBson = Db.FindMany(this.CollectionName, filter);
+            var filter = "{\"userIds\": \"" + userId + "\"}";
+            var gmsBson = await Db.FindMany(this.CollectionName, filter);
             foreach (var bgm in gmsBson)
             {
                 gms.AddLast(GetObjectFromBsonDocument(bgm));
@@ -77,7 +79,7 @@ namespace AppFinal.DB.AccessClasses
             }
 
             update = update.Set("userIds", friendsArray);
-
+            
             return update;
         }
 
