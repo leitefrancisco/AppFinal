@@ -89,7 +89,7 @@ namespace AppFinal.DB.AccessClasses
         /// <returns>the user if log in is correct and null if it isn't</returns>
         public async Task<User> Login(string email, string password)
         {
-            var user = await Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("email", email).ToString());
+            var user = await Db.FindOne(this.CollectionName, "{\"email\": \"" + email + "\"}");
             var passAndHash = await GetHashedPasswordAndSalt(email);
             var checkHash = new Rfc2898DeriveBytes(password, passAndHash["salt"]).GetBytes(64);
 

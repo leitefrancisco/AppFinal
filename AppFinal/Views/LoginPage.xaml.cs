@@ -35,6 +35,7 @@ namespace AppFinal.Views
             {
 
                 var user =await User.Login(TxtUsername.Text, TxtPassword.Text);
+                Console.WriteLine("Aqui foi!!!!");
                 if (user != null)
                 {
                     Console.WriteLine(user);

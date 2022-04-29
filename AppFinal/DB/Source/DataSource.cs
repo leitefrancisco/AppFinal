@@ -144,7 +144,7 @@ namespace AppFinal.DB.Source
             var responseMessage = await this._httpClient.SendAsync(request);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
-            JsonDocument json = JsonDocument.Parse(response);
+            // JsonDocument json = JsonDocument.Parse(response);
 
             var obj = BsonSerializer.Deserialize<BsonArray>(response);
             return obj.ToList()[0].AsBsonDocument;
