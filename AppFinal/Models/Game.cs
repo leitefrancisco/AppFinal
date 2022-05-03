@@ -34,19 +34,18 @@ namespace AppFinal.Models
         /// Generate a BsonDocument from an object
         /// </summary>
         /// <returns>Bson Document</returns>
-        public BsonDocument GetBsonDocument()
+        public string GetBsonDocument()
         {
 
-            var bsonDoc = new BsonDocument()
-            {
-                //{"_id", new ObjectId(this.id)},
-                {"name", this.name},
-                {"thumbnail", this.thumbnailUrl},
-                {"description", this.description},
-                {"path", this.path}
-            };
+            var bsonDoc = "{" +
+                "\"_id\": \""+ this.id + "\"," +
+                "\"name\": \"" + this.name + "\"," +
+                "\"thumbnail\": \"" + this.thumbnailUrl + "\"," +
+                "\"description\": \"" + this.description + "\"," +
+                "\"path\": \"" + this.path + "\"}";
+        
 
-            return bsonDoc;
+            return bsonDoc.ToJson();
         }
 
         public override string ToString()

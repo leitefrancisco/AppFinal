@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson;
-
-namespace AppFinal.Models
+﻿namespace AppFinal.Models
 {
     /// <summary>
     /// achievements collection class
@@ -34,17 +32,15 @@ namespace AppFinal.Models
         /// Transform an achievement into a BsonDocument for the DB
         /// </summary>
         /// <returns>BsonDocument</returns>
-        public BsonDocument GetBsonDocument()
+        public string GetBsonDocument()
         {
 
-            var bsonDoc = new BsonDocument()
-            {
-                {"_id", new ObjectId(this.id)},
-                {"name", this.name},
-                {"thumbnail", this.thumbnailUrl},
-                {"description", this.description},
-                {"achievementPoints", this.achievementPoints}
-            };
+            var bsonDoc = "{"+
+                "\"_id\": " + "\"" + this.id + "\"," +
+                "\"name\": \"" + this.name + "\"," +
+                "\"thumbnail\": \"" + this.thumbnailUrl + "\"," +
+                "\"description\": \"" + this.description + "\"," +
+                "\"achievementPoints\": " + this.achievementPoints + "}";
 
             return bsonDoc;
         }

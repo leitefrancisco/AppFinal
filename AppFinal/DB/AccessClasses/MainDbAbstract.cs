@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AppFinal.DB.Source;
 using AppFinal.Interfaces;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -20,9 +19,9 @@ namespace AppFinal.DB.AccessClasses
         // Each access class for a collection has its own collection name
         protected string CollectionName { get; set; }
         
-        public bool DeleteOne(string objId)
+        public async Task<bool> DeleteOne(string objId)
         {
-            return Db.DeleteOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(objId)));
+            return await Db.DeleteOne(this.CollectionName, "{\"id\": \"" + objId + "\"}");
         }
 
         public async Task<LinkedList<T>> FindMany()
@@ -33,36 +32,39 @@ namespace AppFinal.DB.AccessClasses
 
         public async Task<LinkedList<T>> FindMany(Dictionary<string, string> filters)
         {
-            var objectsBsonDocument = await Db.FindMany(this.CollectionName, GetFilterFromDictionary(filters));
+            var objectsBsonDocument = await Db.FindMany(this.CollectionName, GetJsonFromDictionary(filters));
             return GetLinkedListFromBsonList(objectsBsonDocument);
         }
         
         public async Task<T> FindOne(string objId)
         {
-            var objectBson = await Db.FindOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(objId)).ToString());
+            var objectBson = await Db.FindOne(this.CollectionName, new ObjectId(objId));
             return GetObjectFromBsonDocument(objectBson);
         }
 
         public async Task<T> FindOne(Dictionary<string, string> filters)
         {
-            var objBson = await Db.FindOne(this.CollectionName, GetFilterFromDictionary(filters).ToString());
+            var stringFilter = GetJsonFromDictionary(filters);
+            var objBson = await Db.FindOne(this.CollectionName, stringFilter);
             return GetObjectFromBsonDocument(objBson);
         }
 
         /// <summary>
         /// Get FilterDefinition from a Dictionary
         /// </summary>
-        /// <param name="filters">Dictionary with field name as key and value to be checked as value</param>
+        /// <param name="fields">Dictionary with field name as key and value to be checked as value</param>
         /// <returns>FilterDefinition with the values in the filters</returns>
-        protected string GetFilterFromDictionary(Dictionary<string, string> filters)
+        protected string GetJsonFromDictionary(Dictionary<string, string> fields)
         {
             var filter = "{";
-            foreach (var keyValuePair in filters)
+            foreach (var keyValuePair in fields)
             {
                 Console.WriteLine(keyValuePair);
                 var lineFilter = "\"" + keyValuePair.Key + "\": \"" + keyValuePair.Value + "\",";
                 filter += lineFilter;
             }
+
+            if (filter.Length > 1) filter = filter.Substring(0, filter.Length - 1);
 
             return filter + "}";
 
@@ -96,17 +98,16 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="obj">Object of a given class</param>
         /// <returns>UpdateDefinition</returns>
-        protected abstract UpdateDefinition<BsonDocument> GetUpdateDefinition(T obj);
+        protected abstract string GetUpdateDefinition(T obj);
 
-        public bool InsertOne(T obj)
+        public async Task<bool> InsertOne(T obj)
         {
-            return Db.InsertOne(this.CollectionName, GetBsonDocument(obj));
+            return await Db.InsertOne(this.CollectionName, GetBsonDocument(obj));
         }
 
-        public bool UpdateOne(T obj, string objId)
+        public async Task<bool> UpdateOne(T obj, string id)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(objId));
-            return Db.UpdateOne(this.CollectionName, filter, GetUpdateDefinition(obj));
+            return await Db.UpdateOne(this.CollectionName, id, GetUpdateDefinition(obj));
         }
 
         /// <summary>
@@ -114,6 +115,19 @@ namespace AppFinal.DB.AccessClasses
         /// </summary>
         /// <param name="obj">Object of a given class</param>
         /// <returns>BsonDocument of a given object</returns>
-        protected abstract BsonDocument GetBsonDocument(T obj);
+        protected abstract string GetBsonDocument(T obj);
+
+        public string GetStringFromLinkedList(LinkedList<string> list)
+        {
+            var s = "[";
+            foreach (var el in list)
+            {
+                s += "\"" + el + "\",";
+            }
+
+            if (s.Length > 1) s = s.Substring(0, s.Length - 1);
+            s += "]";
+            return s;
+        }
     }
 }

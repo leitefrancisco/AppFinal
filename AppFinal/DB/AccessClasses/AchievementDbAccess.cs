@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -28,8 +26,8 @@ namespace AppFinal.DB.AccessClasses
         /// <returns>Achievement object</returns>
         public async Task<Achievement> GetAchievementByName(string name)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("name", name);
-            var bson = await Db.FindOne(this.CollectionName, filter.ToString());
+            var filter = "{\"name\": \"" + name + "\"}";
+            var bson = await Db.FindOne(this.CollectionName, filter);
             return GetObjectFromBsonDocument(bson);
 
         }
@@ -54,16 +52,16 @@ namespace AppFinal.DB.AccessClasses
 
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(Achievement obj)
+        protected override string GetUpdateDefinition(Achievement obj)
         {
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("thumbnail", obj.thumbnailUrl);
-            update = update.Set("description", obj.description);
-            update = update.Set("achievementPoints", obj.achievementPoints);
+            var update = "{\"$set\": {\"thumbnail\": \"" + obj.thumbnailUrl + "\"," +
+            "\"description\": \"" + obj.description + "\"," +
+            "\"achievementPoints\": \"" + obj.achievementPoints + "\"}}";
 
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(Achievement obj)
+        protected override string GetBsonDocument(Achievement obj)
         {
             return obj.GetBsonDocument();
         }

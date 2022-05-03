@@ -38,21 +38,21 @@ namespace AppFinal.Interfaces
         /// <param name="obj">Updated object of a given class</param>
         /// <param name="objId">Id of document to be updated</param>
         /// <returns>Success of update</returns>
-        public bool UpdateOne(T obj, string objId);
+        public Task<bool> UpdateOne(T obj, string objId);
 
         /// <summary>
         /// Delete a document from a collection
         /// </summary>
         /// <param name="objId">document id as string</param>
         /// <returns>Success of deletion</returns>
-        public bool DeleteOne(string objId);
+        public Task<bool> DeleteOne(string objId);
 
         /// <summary>
         /// Creates a new document in the DB from an object of a given class
         /// </summary>
         /// <param name="obj">Object to create document in DB for</param>
         /// <returns>Success of insertion</returns>
-        public bool InsertOne(T obj);
+        public Task<bool> InsertOne(T obj);
         
     }
 }

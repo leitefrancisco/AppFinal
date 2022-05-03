@@ -65,10 +65,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="userId">id to add</param>
         /// <returns>success of update</returns>
-        public bool Like(string userId)
+        public async Task<bool> Like(string userId)
         {
             this.Likes.AddLast(userId);
-            return UpdateDb();
+            return await UpdateDb();
         }
 
         /// <summary>
@@ -76,15 +76,15 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="userId">id to remove</param>
         /// <returns>success of update</returns>
-        public bool Unlike(string userId)
+        public async Task<bool> Unlike(string userId)
         {
             this.Likes.Remove(userId);
-            return UpdateDb();
+            return await UpdateDb();
         }
 
-        public bool Delete()
+        public async Task<bool> Delete()
         {
-            return DbAccess.DeleteOne(this.Id);
+            return await DbAccess.DeleteOne(this.Id);
         }
 
         /// <summary>
@@ -103,15 +103,15 @@ namespace AppFinal.Models
         /// <param name="content">content of comment</param>
         /// <param name="mediaUrl">url of media of comment</param>
         /// <returns>object comment or null if error</returns>
-        public Comment NewComment(string userId, string content, string mediaUrl)
+        public async Task<Comment> NewComment(string userId, string content, string mediaUrl)
         {
             var newComment = new Comment(this.Id, userId, content, mediaUrl);
             this.Comments.AddFirst(newComment.Id);
             bool success = true;
             try
             {
-                success &= CommentAccess.InsertOne(newComment);
-                success &= UpdateDb();
+                success &= await CommentAccess.InsertOne(newComment);
+                success &= await UpdateDb();
                 if (success)
                 {
                     return newComment;
@@ -130,10 +130,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="content"></param>
         /// <returns>success of update</returns>
-        public bool EditPost(string content)
+        public async Task<bool> EditPost(string content)
         {
             this.Content = content;
-            return UpdateDb();
+            return await UpdateDb();
 
         }
 
@@ -141,11 +141,11 @@ namespace AppFinal.Models
         /// Saves current state of object in the DB
         /// </summary>
         /// <returns>success of update</returns>
-        private bool UpdateDb()
+        private async Task<bool> UpdateDb()
         {
             try
             {
-                return DbAccess.UpdateOne(this, this.Id);
+                return await DbAccess.UpdateOne(this, this.Id);
             }
             catch (Exception e)
             {
@@ -190,33 +190,24 @@ namespace AppFinal.Models
             return $"{nameof(Id)}: {Id}, {nameof(UserId)}: {UserId}, {nameof(Date)}: {Date}, {nameof(Content)}: {Content}, {nameof(Likes)}({Likes.Count}): {likeString}, {nameof(MediaUrl)}: {MediaUrl}, {nameof(Comments)}({Comments.Count}): {commentString}";
         }
 
-        public BsonDocument GetBsonDocument()
+        public string GetBsonDocument()
         {
-            BsonArray likesArray = new BsonArray();
-            foreach (var like in this.Likes)
-            {
-                likesArray.Add(like);
-            }
+            var likesArray = DbAccess.GetStringFromLinkedList(this.Likes);
 
-            BsonArray commentsArray = new BsonArray();
-            foreach (var comment in this.Comments)
-            {
-                commentsArray.Add(comment);
-            }
+            var commentsArray = DbAccess.GetStringFromLinkedList(this.Comments);
 
-            var bsonDoc = new BsonDocument()
-            {
-                {"_id", new ObjectId(this.Id)},
-                {"userId", this.UserId},
-                {"date", this.Date},
-                {"content", this.Content},
-                {"likes", likesArray},
-                {"comments", commentsArray}
-            };
+            var bsonDoc = "{" +
+                "\"_id\": \"" + this.Id + "\"," +
+                "\"userId\": \"" + this.UserId + "\"," +
+                "\"date\": \"" + this.Date + "\"," +
+                "\"content\": \"" + this.Content + "\"," +
+                "\"likes\":" + likesArray + "," +
+                "\"comments\":" + commentsArray + "}";
 
             if (this.MediaUrl != null)
             {
-                bsonDoc.Add(new BsonElement("media", this.MediaUrl));
+                bsonDoc = bsonDoc.Substring(0, bsonDoc.Length - 1);
+                bsonDoc += ", \"media\": \"" + this.MediaUrl + "\"}";
             }
 
             return bsonDoc;

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using AppFinal.Models;
+using AppFinal.Interfaces;
+using Xamarin.Forms;
 
 namespace AppFinal.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        
+        public IDataStore<Friend> DataStore => DependencyService.Get<IDataStore<Friend>>();
 
         bool isBusy = false;
         public bool IsBusy

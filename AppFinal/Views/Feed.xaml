@@ -6,7 +6,7 @@
              Title= "{Binding Title}">
     <ContentPage.BindingContext>
         <vm:FeedViewModel/>
-    </ContentPage.BindingContext>    
+    </ContentPage.BindingContext>
 
     <ContentPage.Content>
         <Grid>
@@ -22,14 +22,14 @@
             </Grid.ColumnDefinitions>
 
             <Image Source="indie" BackgroundColor="White"
-               Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" />
+                   Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" />
             <Editor Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
-                Placeholder="Save Your Achievements" FontSize="Medium"/>
+                    Placeholder="Save Your Achievements" FontSize="Medium"/>
             <Button Grid.Row="2" Grid.Column="0" Text="Save" />
             <Button Grid.Row="2" Grid.Column="1" Text="Erase" />
 
             <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="All Saved!"
-               FontSize="Large"/>
+                   FontSize="Large"/>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

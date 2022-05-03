@@ -82,10 +82,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="reg">region name</param>
         /// <returns>success of update</returns>
-        public bool UpdateRegion(string reg)
+        public async Task<bool> UpdateRegion(string reg)
         {
             this.region = reg;
-            return Update();
+            return await Update();
         }
 
         /// <summary>
@@ -93,10 +93,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="lang">language name</param>
         /// <returns>success of update</returns>
-        public bool UpdateLanguage(string lang)
+        public async Task<bool> UpdateLanguage(string lang)
         {
             this.language = lang;
-            return Update();
+            return await Update();
         }
 
         /// <summary>
@@ -109,8 +109,8 @@ namespace AppFinal.Models
             this.friends.AddLast(userId);
             var newFriend = await DbAccess.FindOne(userId);
             newFriend.friends.AddLast(this.id);
-            newFriend.Update();
-            return Update();
+            await newFriend.Update();
+            return await Update();
         }
 
         /// <summary>
@@ -118,10 +118,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="userId">id of user who requested friendship</param>
         /// <returns>success of update</returns>
-        public bool CancelFriendRequest(string userId)
+        public async Task<bool> CancelFriendRequest(string userId)
         {
             this.friendsRequest.Remove(userId);
-            return Update();
+            return await Update();
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace AppFinal.Models
         {
             var requestFriend = await DbAccess.FindOne(userId);
             requestFriend.friendsRequest.AddLast(this.id);
-            return requestFriend.Update();
+            return await requestFriend.Update();
         }
 
         /// <summary>
@@ -141,10 +141,10 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="url">url of new picture</param>
         /// <returns>success of update</returns>
-        public bool ChangePicture(string url)
+        public async Task<bool> ChangePicture(string url)
         {
             this.pictureUrl = url;
-            return Update();
+            return await Update();
         }
 
         /// <summary>
@@ -157,8 +157,8 @@ namespace AppFinal.Models
             this.friends.Remove(userId);
             var removedFriend = await DbAccess.FindOne(userId);
             await removedFriend.RemoveFriend(this.id);
-            removedFriend.Update();
-            return Update();
+            await removedFriend.Update();
+            return await Update();
         }
 
         /// <summary>
@@ -185,9 +185,9 @@ namespace AppFinal.Models
         /// <param name="content">content of message</param>
         /// <param name="mediaUrl">url of media of message</param>
         /// <returns>success of document creation</returns>
-        public bool SendMessage(string receiver, string content, string mediaUrl)
+        public async Task<bool> SendMessage(string receiver, string content, string mediaUrl)
         {
-            return MessageDbAccess.InsertOne(new Message(this.id, receiver, content, mediaUrl));
+            return await MessageDbAccess.InsertOne(new Message(this.id, receiver, content, mediaUrl));
         }
 
         /// <summary>
@@ -196,9 +196,9 @@ namespace AppFinal.Models
         /// <param name="content">post content</param>
         /// <param name="mediaUrl">url of media of post</param>
         /// <returns>success of document creation</returns>
-        public bool Post(string content, string mediaUrl)
+        public async Task<bool> Post(string content, string mediaUrl)
         {
-            return PostDbAccess.InsertOne(new Post(this.id, content, mediaUrl));
+            return await PostDbAccess.InsertOne(new Post(this.id, content, mediaUrl));
         }
 
         /// <summary>
@@ -208,9 +208,9 @@ namespace AppFinal.Models
         /// <param name="content">content of new comment</param>
         /// <param name="mediaUrl">url of media of comment</param>
         /// <returns>success of document creation</returns>
-        public bool Comment(string postId, string content, string mediaUrl)
+        public async Task<bool> Comment(string postId, string content, string mediaUrl)
         {
-            return CommentDbAccess.InsertOne(new Comment(postId, this.id, content, mediaUrl));
+            return await CommentDbAccess.InsertOne(new Comment(postId, this.id, content, mediaUrl));
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace AppFinal.Models
             this.achievements.AddLast(achievementId);
             CheckLevelUp(pointsToAdd);
             
-            return Update();
+            return await Update();
         }
 
         /// <summary>
@@ -299,11 +299,11 @@ namespace AppFinal.Models
         /// Update document in DB
         /// </summary>
         /// <returns>success of update</returns>
-        private bool Update()
+        private async Task<bool> Update()
         {
             try
             {
-                return DbAccess.UpdateOne(this, this.id);
+                return await DbAccess.UpdateOne(this, this.id);
             }
             catch (Exception e)
             {
@@ -329,9 +329,32 @@ namespace AppFinal.Models
         /// <param name="oldPassword">current password</param>
         /// <param name="newPassword">new password</param>
         /// <returns>0: invalid password, 1: error in the update, 2: successful update</returns>
-        public int UpdatePassword(string oldPassword, string newPassword)
+        public async Task<int> UpdatePassword(string oldPassword, string newPassword)
         {
-            return DbAccess.UpdatePassword(this.id, this.email, oldPassword, newPassword);
+            return await DbAccess.UpdatePassword(this.id, this.email, oldPassword, newPassword);
+        }
+
+        /// <summary>
+        /// Create a new user with username and password
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password">plain text</param>
+        /// <returns>new user or null if unsuccessful</returns>
+        public static async Task<User> CreateUser(string username, string password)
+        {
+            var user = new User(username, password);
+            var success = await DbAccess.InsertOne(user, password);
+            return success ? user : null;
+        }
+
+        /// <summary>
+        /// Delete user by id
+        /// </summary>
+        /// <param name="delId">user id to be deleted</param>
+        /// <returns>success of deletion</returns>
+        public static async Task<bool> DeleteUser(string delId)
+        {
+            return await DbAccess.DeleteOne(delId);
         }
 
         public override string ToString()
@@ -339,44 +362,31 @@ namespace AppFinal.Models
             return $"{nameof(id)}: {id}, {nameof(username)}: {username}, {nameof(pictureUrl)}: {pictureUrl}, {nameof(email)}: {email}, {nameof(language)}: {language}, {nameof(region)}: {region}, {nameof(accountLevel)}: {accountLevel}, {nameof(achievementPoints)}: {achievementPoints}, {nameof(friends)}: {friends.Count}, {nameof(achievements)}: {achievements.Count}";
         }
 
-        /**
-         * Gets Bson Document
-         */
-        public BsonDocument GetBsonDocument()
+        /// <summary>
+        /// Get JSON document
+        /// </summary>
+        /// <returns></returns>
+        public string GetJsonDocument()
         {
 
-            BsonArray friendsArray = new BsonArray();
-            foreach (var friend in this.friends)
-            {
-                friendsArray.Add(friend);
-            }
+            var friendsArray = DbAccess.GetStringFromLinkedList(this.friends);
 
-            BsonArray achievementsArray = new BsonArray();
-            foreach (var achievement in this.achievements)
-            {
-                achievementsArray.Add(achievement);
-            }
+            var achievementsArray = DbAccess.GetStringFromLinkedList(this.achievements);
 
-            BsonArray requestsArray = new BsonArray();
-            foreach (var req in this.friendsRequest)
-            {
-                requestsArray.Add(req);
-            }
-            
-            var bsonDoc = new BsonDocument()
-            {
-                {"_id", new ObjectId(this.id)},
-                {"username", this.username},
-                {"profilePicture", this.pictureUrl},
-                {"email", this.email},
-                {"language", this.language},
-                {"region", this.region},
-                {"accountLevel", this.accountLevel},
-                {"totalAchievementPoints", this.achievementPoints},
-                {"friends", friendsArray},
-                {"friendsRequest", requestsArray},
-                {"achievements", achievementsArray}
-            };
+            var requestsArray = DbAccess.GetStringFromLinkedList(this.friendsRequest);
+
+            var bsonDoc = "{" +
+                          "\"_id\": " + "\"" + this.id + "\"," +
+                          "\"username\": \"" + this.username + "\"," +
+                          "\"profilePicture\": \"" + this.pictureUrl + "\"," +
+                          "\"email\": \"" + this.email + "\"," +
+                          "\"language\": \"" + this.language + "\"," +
+                          "\"region\": \"" + this.region + "\"," +
+                          "\"accountLevel\":" + this.accountLevel + "," +
+                          "\"totalAchievementPoints\": " + this.achievementPoints + "," +
+                          "\"friends\":" + friendsArray + "," +
+                          "\"friendsRequest\": " + requestsArray + "," +
+                          "\"achievements\": " + achievementsArray + "}";
 
             return bsonDoc;
         }

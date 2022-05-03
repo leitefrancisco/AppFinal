@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -37,19 +35,21 @@ namespace AppFinal.DB.AccessClasses
         /// <param name="user">user to be created</param>
         /// <param name="password">plain text password to be hashed and salted</param>
         /// <returns>success of creation</returns>
-        public bool InsertOne(User user, string password)
+        public async Task<bool> InsertOne(User user, string password)
         {
             var salt = GenerateRandomSalt();
-            Console.WriteLine(Convert.ToBase64String(salt));
+            Console.WriteLine("salt: " + Convert.ToBase64String(salt));
 
             var hashed = new Rfc2898DeriveBytes(password, salt).GetBytes(64);
-            Console.WriteLine(Convert.ToBase64String(hashed));
+            Console.WriteLine("hash: " + Convert.ToBase64String(hashed));
 
-            var bson = user.GetBsonDocument();
-            bson.Add(new BsonElement("password", hashed));
-            bson.Add(new BsonElement("salt", salt));
+            var bson = user.GetJsonDocument();
+            
+            bson = bson.Substring(0, bson.Length - 1);
+            bson += ", \"password\": \"" + Convert.ToBase64String(hashed) + "\",";
+            bson += "\"salt\": \"" + Convert.ToBase64String(salt) + "\"}";
 
-            return Db.InsertOne(this.CollectionName, bson);
+            return await Db.InsertOne(this.CollectionName, bson);
         }
 
         /// <summary>
@@ -73,12 +73,18 @@ namespace AppFinal.DB.AccessClasses
         public async Task<Dictionary<string, byte[]>> GetHashedPasswordAndSalt(string email)
         {
             var dict = new Dictionary<string, byte[]>();
-            var filter = Builders<BsonDocument>.Filter.Eq("email", email);
-            var bson = await Db.FindOne(this.CollectionName, filter.ToString());
-            dict.Add("salt", bson["salt"].AsByteArray);
-            dict.Add("pass", bson["password"].AsByteArray);
+            var filter = "{\"email\": \"" + email + "\"}";
+            var bson = await Db.FindOne(this.CollectionName, filter);
+
+            dict.Add("salt", GetBytesFromString(bson["salt"].AsString));
+            dict.Add("pass", GetBytesFromString(bson["password"].AsString));
 
             return dict;
+        }
+
+        private byte[] GetBytesFromString(string s)
+        {
+            return Convert.FromBase64String(s);
         }
 
         /// <summary>
@@ -89,11 +95,24 @@ namespace AppFinal.DB.AccessClasses
         /// <returns>the user if log in is correct and null if it isn't</returns>
         public async Task<User> Login(string email, string password)
         {
-            var user = await Db.FindOne(this.CollectionName, "{\"email\": \"" + email + "\"}");
-            var passAndHash = await GetHashedPasswordAndSalt(email);
-            var checkHash = new Rfc2898DeriveBytes(password, passAndHash["salt"]).GetBytes(64);
 
-            return Convert.ToBase64String(checkHash).Equals(Convert.ToBase64String(passAndHash["pass"])) ? GetObjectFromBsonDocument(user) : null;
+            var user = await Db.FindOne(this.CollectionName, "{\"email\": \"" + email + "\"}");
+            var pass = GetBytesFromString(user["password"].AsString);
+            var salt = GetBytesFromString(user["salt"].AsString);
+
+            var checkHash = new Rfc2898DeriveBytes(password, salt).GetBytes(64);
+            return Convert.ToBase64String(checkHash).Equals(Convert.ToBase64String(pass)) ? GetObjectFromBsonDocument(user) : null;
+            //var user = await Db.FindOne(this.CollectionName, "{\"email\": \"" + email + "\"}");
+            //Console.WriteLine("bson user" + user);
+            //var passAndHash = await GetHashedPasswordAndSalt(email);
+            //Console.WriteLine("from DB:");
+            //foreach (var a in passAndHash)
+            //{
+            //    Console.WriteLine(a.Key + ": " + a.Value);
+            //}
+            //var checkHash = new Rfc2898DeriveBytes(password, passAndHash["salt"]).GetBytes(64);
+            //Console.WriteLine("From user: " + Convert.ToBase64String(checkHash));
+            //return Convert.ToBase64String(checkHash).Equals(Convert.ToBase64String(passAndHash["pass"])) ? GetObjectFromBsonDocument(user) : null;
 
         }
 
@@ -105,16 +124,16 @@ namespace AppFinal.DB.AccessClasses
         /// <param name="oldPassword">current password</param>
         /// <param name="newPassword">new password</param>
         /// <returns>invalid credentials: 0, update error: 1, success: 2</returns>
-        public int UpdatePassword(string userId, string email, string oldPassword, string newPassword)
+        public async Task<int> UpdatePassword(string userId, string email, string oldPassword, string newPassword)
         {
-            if (Login(email, oldPassword) == null) return 0;
+            if (await Login(email, oldPassword) == null) return 0;
 
             var salt = GenerateRandomSalt();
             var hashed = new Rfc2898DeriveBytes(newPassword, salt).GetBytes(64);
             
-            var update = Builders<BsonDocument>.Update.Set("salt", salt).Set("password", hashed);
+            var update = "\"{$set\": {\"salt\": \"" + salt +"\", \"password\": \"" + hashed + "\"}";
 
-            return Db.UpdateOne(this.CollectionName, Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(userId)), update) ? 2 : 1;
+            return await Db.UpdateOne(this.CollectionName,"{ \"_id\": \"" + new ObjectId(userId) + "\"}", update) ? 2 : 1;
         }
 
 
@@ -136,9 +155,13 @@ namespace AppFinal.DB.AccessClasses
             return GetObjectFromBsonDocument(bson);
         }
 
+        /// <summary>
+        /// Converts BsonDocument to a User object
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
         protected override User GetObjectFromBsonDocument(BsonDocument document)
         {
-
             try
             {
                 var id = document["_id"].ToString();
@@ -174,49 +197,43 @@ namespace AppFinal.DB.AccessClasses
                 return new User(id, username, pictureUrl, email, language, region, accountLevel, achievementPoints,
                     friends, achievements, friendsRequest);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return null;
             }
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(User user)
+        /// <summary>
+        /// Creates an update definition for mongodb {$set: {definition}}
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        protected override string GetUpdateDefinition(User user)
         {
-            BsonArray friendsArray = new BsonArray();
-            foreach (var friend in user.friends)
-            {
-                friendsArray.Add(friend);
-            }
+            var friendsArray = GetStringFromLinkedList(user.friends);
 
-            BsonArray achievementsArray = new BsonArray();
-            foreach (var achievement in user.achievements)
-            {
-                achievementsArray.Add(achievement);
-            }
+            var achievementsArray = GetStringFromLinkedList(user.achievements);
 
-            BsonArray requestsArray = new BsonArray();
-            foreach (var req in user.friendsRequest)
-            {
-                requestsArray.Add(req);
-            }
+            var requestsArray = GetStringFromLinkedList(user.friendsRequest);
 
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("username", user.username)
-                .Set("profilePicture", user.pictureUrl)
-                .Set("email", user.email)
-                .Set("language", user.language)
-                .Set("region", user.region)
-                .Set("accountLevel", user.accountLevel)
-                .Set("totalAchievementPoints", user.achievementPoints)
-                .Set("friends", friendsArray)
-                .Set("achievements", achievementsArray)
-                .Set("friendsRequest", requestsArray);
+            var update = "{\"$set\": {\"username\": \"" + user.username +"\"," +
+                "\"profilePicture\": \"" + user.pictureUrl +"\"," +
+                "\"email\": \"" + user.email + "\"," +
+                "\"language\": \"" + user.language + "\"," +
+                "\"region\": \"" + user.region + "\"," +
+                "\"accountLevel\": " + user.accountLevel + "," +
+                "\"totalAchievementPoints\": " + user.achievementPoints + "," +
+                "\"friends\": " + friendsArray + "," +
+                "\"achievements\": " + achievementsArray +"," +
+                "\"friendsRequest\": " + requestsArray +"}}";
 
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(User obj)
+        protected override string GetBsonDocument(User obj)
         {
-            return obj.GetBsonDocument();
+            return obj.GetJsonDocument();
         }
     }
 }

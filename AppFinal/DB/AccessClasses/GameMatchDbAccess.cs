@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -66,24 +64,20 @@ namespace AppFinal.DB.AccessClasses
 
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(GameMatch obj)
+        protected override string GetUpdateDefinition(GameMatch obj)
         {
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("gameId", obj.gameId);
-            update = update.Set("date", obj.date);
-            update = update.Set("winnerId", obj.winnerId);
+            var update = "{\"$set\": {\"gameId\": \"" + obj.gameId + "\"," +
+            "\"date\": \"" + obj.date + "\"," +
+            "\"winnerId\": \"" + obj.winnerId + "\",";
 
-            BsonArray friendsArray = new BsonArray();
-            foreach (var id in obj.userIds)
-            {
-                friendsArray.Add(id);
-            }
+            var friendsArray = GetStringFromLinkedList(obj.userIds);
 
-            update = update.Set("userIds", friendsArray);
+            update += "\"userIds\": " + friendsArray + "}}";
             
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(GameMatch obj)
+        protected override string GetBsonDocument(GameMatch obj)
         {
             return obj.GetBsonDocument();
         }

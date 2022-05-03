@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -54,29 +52,22 @@ namespace AppFinal.DB.AccessClasses
             }
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(Post post)
+        protected override string GetUpdateDefinition(Post post)
         {
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("content", post.Content);
-            update = update.Set("media", post.MediaUrl);
+            var update = "{\"$set\": {\"content\": \"" + post.Content + "\"," +
+                         "\"media\": \"" + post.MediaUrl + "\",";
 
-            BsonArray likesArray = new BsonArray();
-            foreach (var like in post.Likes)
-            {
-                likesArray.Add(like);
-            }
+            var likesArray = GetStringFromLinkedList(post.Likes);
 
-            BsonArray commentsArray = new BsonArray();
-            foreach (var comment in post.Comments)
-            {
-                commentsArray.Add(comment);
-            }
-            update = update.Set("likes", likesArray);
-            update = update.Set("comments", commentsArray);
+            var commentsArray = GetStringFromLinkedList(post.Comments);
+
+            update += "\"likes\": " + likesArray + ",";
+            update += "\"comments\": " + commentsArray + "}}";
 
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(Post obj)
+        protected override string GetBsonDocument(Post obj)
         {
             return obj.GetBsonDocument();
         }

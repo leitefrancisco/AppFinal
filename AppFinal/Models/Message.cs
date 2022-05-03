@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AppFinal.DB.AccessClasses;
-using DataAccess.Models;
 using MongoDB.Bson;
 
 namespace AppFinal.Models
@@ -62,30 +62,30 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="newStatus">MessageStatus</param>
         /// <returns>success of update</returns>
-        public bool ChangeStatus(MessageStatus newStatus)
+        public async Task<bool> ChangeStatus(MessageStatus newStatus)
         {
             this.status = newStatus;
-            return Update();
+            return await Update();
         }
 
         /// <summary>
         /// Delete message
         /// </summary>
         /// <returns>success of deletion</returns>
-        public bool DeleteMessage()
+        public async Task<bool> DeleteMessage()
         {
-            return new MessageDbAccess().DeleteOne(this.id);
+            return await new MessageDbAccess().DeleteOne(this.id);
         }
 
         /// <summary>
         /// Update current object document in the DB
         /// </summary>
         /// <returns>success of update</returns>
-        private bool Update()
+        private async Task<bool> Update()
         {
             try
             {
-                return new MessageDbAccess().UpdateOne(this, this.id);
+                return await new MessageDbAccess().UpdateOne(this, this.id);
             }
             catch (Exception e)
             {
@@ -99,21 +99,20 @@ namespace AppFinal.Models
             return $"{nameof(id)}: {id}, {nameof(sender)}: {sender}, {nameof(receiver)}: {receiver}, {nameof(content)}: {content}, {nameof(mediaUrl)}: {mediaUrl}, {nameof(date)}: {date}, {nameof(status)}: {status.ToString()}";
         }
 
-        public BsonDocument GetBsonDocument()
+        public string GetBsonDocument()
         {
-            var bsonDoc = new BsonDocument()
-            {
-                //{"_id", new ObjectId(this.id)},
-                {"by", this.sender},
-                {"to", this.receiver},
-                {"content", this.content},
-                {"date", this.date},
-                {"messageStatus", MessageStatusGetter.GetMessageStatus(this.status)}
-            };
+            var bsonDoc = "{" +
+                "\"_id\": \"" + this.id + "\"," +
+                "\"by\": \"" + this.sender + "\"," +
+                "\"to\": \"" + this.receiver + "\"," +
+                "\"content\": \"" + this.content + "\"," +
+                "\"date\": \"" + this.date + "\"," +
+                "\"messageStatus\": \"" + MessageStatusGetter.GetMessageStatus(this.status) + "\"}";
 
             if (this.mediaUrl != null)
             {
-                bsonDoc.Add(new BsonElement("mediaUrl", this.mediaUrl));
+                bsonDoc = bsonDoc.Substring(0, bsonDoc.Length - 1);
+                bsonDoc += ", \"mediaUrl\": \"" + this.mediaUrl + "\"}";
             }
 
             return bsonDoc;

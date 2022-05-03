@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DataAccess.Models
+namespace AppFinal.Models
 {
     /// <summary>
     /// Message Status Enumerator

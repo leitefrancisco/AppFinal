@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -114,29 +112,23 @@ namespace AppFinal.DB.AccessClasses
             }
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(Comment obj)
+        protected override string GetUpdateDefinition(Comment obj)
         {
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("content", obj.Content);
-            update = update.Set("media", obj.MediaUrl);
+            var update = "{\"$set\": {\"content\": \"" + obj.Content + "\"," +
+                         "\"media\": \"" + obj.MediaUrl + "\",";
 
-            BsonArray likesArray = new BsonArray();
-            foreach (var like in obj.Likes)
-            {
-                likesArray.Add(like);
-            }
+            var likesArray = new CommentDbAccess().GetStringFromLinkedList(obj.Likes);
 
-            BsonArray commentsArray = new BsonArray();
-            foreach (var comment in obj.Comments)
-            {
-                commentsArray.Add(comment);
-            }
-            update = update.Set("likes", likesArray);
-            update = update.Set("comments", commentsArray);
+
+            var commentsArray = new CommentDbAccess().GetStringFromLinkedList(obj.Comments);
+
+            update += "\"likes\": " + likesArray + ",";
+            update += "\"comments\": " + commentsArray + "}}";
 
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(Comment obj)
+        protected override string GetBsonDocument(Comment obj)
         {
             return obj.GetBsonDocument();
         }

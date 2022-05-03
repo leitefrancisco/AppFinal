@@ -1,8 +1,6 @@
 ﻿using System;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -37,17 +35,17 @@ namespace AppFinal.DB.AccessClasses
             }
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(Game obj)
+        protected override string GetUpdateDefinition(Game obj)
         {
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("name", obj.name);
-            update = update.Set("thumbnail", obj.thumbnailUrl);
-            update = update.Set("description", obj.description);
-            update = update.Set("path", obj.path);
+            var update = "{\"$set\": {\"name\": \"" + obj.name + "\"," +
+            "\"thumbnail\": \"" + obj.thumbnailUrl + "\"," +
+            "\"description\": \"" + obj.description + "\"," +
+            "\"path\": \"" + obj.path + "\"}}";
 
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(Game obj)
+        protected override string GetBsonDocument(Game obj)
         {
             return obj.GetBsonDocument();
         }

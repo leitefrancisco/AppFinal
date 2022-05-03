@@ -4,10 +4,9 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AppFinal.DB.AccessClasses;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 
 namespace AppFinal.DB.Source
 {
@@ -83,26 +82,7 @@ namespace AppFinal.DB.Source
             return documents;
             
         }
-
-        public async Task Test(string collection)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
-            request.Content = new StringContent("{\"region\": \"Taubate\"}", Encoding.UTF8, "application/json");
-
-            var responseMessage = await this._httpClient.SendAsync(request);
-
-            var response = await responseMessage.Content.ReadAsStringAsync();
-            JsonDocument json = JsonDocument.Parse(response);
-
-            var array = BsonSerializer.Deserialize<BsonArray>(response);
-            Console.WriteLine("Results");
-            foreach (var r in array)
-            {
-                var user = new UserDbAccess().GetUserFromBson(r.AsBsonDocument);
-                Console.WriteLine("User: " + user);
-            }
-
-        }
+        
 
         /// <summary>
         /// Find all documents in collection that match the given filter
@@ -140,14 +120,50 @@ namespace AppFinal.DB.Source
         {
             var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
             request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
-
+            Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
-            // JsonDocument json = JsonDocument.Parse(response);
+            Console.WriteLine("response: " + response);
+            JsonDocument json = JsonDocument.Parse(response);
 
             var obj = BsonSerializer.Deserialize<BsonArray>(response);
-            return obj.ToList()[0].AsBsonDocument;
+            try
+            {
+                return obj.ToList()[0].AsBsonDocument;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Finds one document in collection using a filter definition
+        /// </summary>
+        /// <param name="collection">collection name</param>
+        /// <param name="filter">FilterDefinition</param>
+        /// <returns>single BsonDocument</returns>
+        public async Task<BsonDocument> FindOne(string collection, ObjectId objId)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection + "/" + objId);
+            request.Content = new StringContent("{}", Encoding.UTF8, "application/json");
+            //Console.WriteLine("request: " + request.ToJson());
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            //Console.WriteLine("response: " + response);
+            JsonDocument json = JsonDocument.Parse(response);
+
+            var obj = BsonSerializer.Deserialize<BsonArray>(response);
+            try
+            {
+                return obj.ToList()[0].AsBsonDocument;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -156,19 +172,18 @@ namespace AppFinal.DB.Source
         /// <param name="collection">collection name</param>
         /// <param name="document">BsonDocument to be added</param>
         /// <returns>success of insertion</returns>
-        public bool InsertOne(string collection, BsonDocument document)
+        public async Task<bool> InsertOne(string collection, string document)
         {
-            return false;
-            //try
-            //{
-            //    this._httpClient.GetCollection<BsonDocument>(collection).InsertOne(document);
-            //    return true;
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //    return false;
-            //}
+            Console.WriteLine(document);
+            Console.WriteLine("being sent: " + JObject.Parse(document));
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path + collection);
+            request.Content = new StringContent(JObject.Parse(document).ToString(), Encoding.UTF8, "application/json");
+            Console.WriteLine("request: " + request.ToJson());
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            Console.WriteLine("response: " + response);
+            return responseMessage.IsSuccessStatusCode;
         }
 
         /// <summary>
@@ -177,19 +192,17 @@ namespace AppFinal.DB.Source
         /// <param name="collection">collection name</param>
         /// <param name="filter">filter to check what document to be deleted</param>
         /// <returns>success of deletion</returns>
-        public bool DeleteOne(string collection, FilterDefinition<BsonDocument> filter)
+        public async Task<bool> DeleteOne(string collection, string filter)
         {
-            return false;
-            //try
-            //{
-            //    this._httpClient.GetCollection<BsonDocument>(collection).DeleteOne(filter);
-            //    return true;
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //    return false;
-            //}
+            Console.WriteLine(filter);
+            var request = new HttpRequestMessage(HttpMethod.Delete, this.path + collection);
+            request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
+            Console.WriteLine("request: " + request.ToJson());
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            Console.WriteLine("response: " + response);
+            return responseMessage.IsSuccessStatusCode;
         }
 
         /// <summary>
@@ -199,9 +212,16 @@ namespace AppFinal.DB.Source
         /// <param name="filter">FilterDefinition</param>
         /// <param name="update">UpdateDefinition</param>
         /// <returns>success of update</returns>
-        public bool UpdateOne(string collection, FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public async Task<bool> UpdateOne(string collection, string id, string update)
         {
-            return false;
+            var request = new HttpRequestMessage(HttpMethod.Put, this.path + collection + "/" + id);
+            request.Content = new StringContent(update, Encoding.UTF8, "application/json");
+            Console.WriteLine("request: " + request.ToJson());
+            var responseMessage = await this._httpClient.SendAsync(request);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            Console.WriteLine("response: " + response);
+            return responseMessage.IsSuccessStatusCode;
             //try
             //{
             //    var res = this._httpClient.GetCollection<BsonDocument>(collection).UpdateOne(filter, update);

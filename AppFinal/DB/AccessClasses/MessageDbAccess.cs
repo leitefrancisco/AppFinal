@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AppFinal.Models;
-using DataAccess.Models;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace AppFinal.DB.AccessClasses
 {
@@ -99,20 +97,20 @@ namespace AppFinal.DB.AccessClasses
             }
         }
 
-        protected override UpdateDefinition<BsonDocument> GetUpdateDefinition(Message message)
+        protected override string GetUpdateDefinition(Message message)
         {
 
-            UpdateDefinition<BsonDocument> update = Builders<BsonDocument>.Update.Set("by", message.sender);
-            update = update.Set("to", message.receiver);
-            update = update.Set("content", message.content);
-            update = update.Set("mediaUrl", message.mediaUrl);
-            update = update.Set("date", message.date);
-            update = update.Set("messageStatus", MessageStatusGetter.GetMessageStatus(message.status));
+            var update = "{\"$set\": {\"by\": \"" + message.sender + "\"," +
+                         "\"to\": \"" + message.receiver + "\"," +
+                         "\"content\": \"" + message.content + "\"," +
+                         "\"mediaUrl\": \"" + message.mediaUrl + "\"," +
+                         "\"date\": \"" + message.date + "\"," +
+                         "\"messageStatus\": \"" + MessageStatusGetter.GetMessageStatus(message.status) + "\"}}";
 
             return update;
         }
 
-        protected override BsonDocument GetBsonDocument(Message obj)
+        protected override string GetBsonDocument(Message obj)
         {
             return obj.GetBsonDocument();
         }

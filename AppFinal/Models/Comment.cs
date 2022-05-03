@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.DB.AccessClasses;
-using DataAccess.Models;
 using MongoDB.Bson;
 
 namespace AppFinal.Models
@@ -51,15 +51,15 @@ namespace AppFinal.Models
         /// <param name="newCommentContent"></param>
         /// <param name="newCommentMediaUrl"></param>
         /// <returns>new comment object or null if error</returns>
-        public new Comment NewComment(string newCommentUserId, string newCommentContent, string newCommentMediaUrl)
+        public new async Task<Comment> NewComment(string newCommentUserId, string newCommentContent, string newCommentMediaUrl)
         {
             var newComment = new Comment(this.Id, newCommentUserId, newCommentContent, newCommentMediaUrl);
             this.Comments.AddFirst(newComment.Id);
             var success = true;
             try
             {
-                success &= DbAccess.InsertOne(newComment);
-                success &= UpdateDb();
+                success &= await DbAccess.InsertOne(newComment);
+                success &= await UpdateDb();
                 return success ? newComment : null;
             }
             catch (Exception e)
@@ -73,34 +73,25 @@ namespace AppFinal.Models
         /// Create Bson Document based on object
         /// </summary>
         /// <returns>Bson Document</returns>
-        public new BsonDocument GetBsonDocument()
+        public new string GetBsonDocument()
         {
-            var likesArray = new BsonArray();
-            foreach (var like in this.Likes)
-            {
-                likesArray.Add(like);
-            }
+            var likesArray = DbAccess.GetStringFromLinkedList(this.Likes);
 
-            var commentsArray = new BsonArray();
-            foreach (var comment in this.Comments)
-            {
-                commentsArray.Add(comment);
-            }
+            var commentsArray = DbAccess.GetStringFromLinkedList(this.Comments);
 
-            var bsonDoc = new BsonDocument()
-            {
-                {"_id", new ObjectId(this.Id)},
-                {"postId", this.PostId},
-                {"userId", this.UserId},
-                {"date", this.Date},
-                {"content", this.Content},
-                {"likes", likesArray},
-                {"comments", commentsArray}
-            };
+            var bsonDoc = "{" +
+                "\"_id\": \"" + this.Id + "\"," +
+                "\"postId\": \"" + this.PostId + "\"," +
+                "\"userId\": \"" + this.UserId + "\"," +
+                "\"date\": \"" + this.Date + "\"," +
+                "\"content\": \"" + this.Content + "\"," +
+                "\"likes\":" + likesArray + "," +
+                "\"comments\": " + commentsArray + "}";
 
             if (this.MediaUrl != null)
             {
-                bsonDoc.Add(new BsonElement("media", this.MediaUrl));
+                bsonDoc = bsonDoc.Substring(0, bsonDoc.Length - 1);
+                bsonDoc += ", \"media\": \"" + this.MediaUrl + "\"}";
             }
 
             return bsonDoc;
@@ -110,11 +101,11 @@ namespace AppFinal.Models
         /// Save changes on the DB
         /// </summary>
         /// <returns>Success of update</returns>
-        private bool UpdateDb()
+        private async Task<bool> UpdateDb()
         {
             try
             {
-                return DbAccess.UpdateOne(this, this.Id);
+                return await DbAccess.UpdateOne(this, this.Id);
             }
             catch (Exception e)
             {

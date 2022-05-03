@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AppFinal.DB.AccessClasses;
 using MongoDB.Bson;
 
@@ -51,29 +52,23 @@ namespace AppFinal.Models
         /// </summary>
         /// <param name="winId">winner id</param>
         /// <returns>Success of update</returns>
-        public bool SetWinner(string winId)
+        public async Task<bool> SetWinner(string winId)
         {
             this.winnerId = winId;
-            return new GameMatchDbAccess().UpdateOne(this, this.id);
+            return await new GameMatchDbAccess().UpdateOne(this, this.id);
         }
 
-        public BsonDocument GetBsonDocument()
+        public string GetBsonDocument()
         {
 
-            BsonArray userIdsArray = new BsonArray();
-            foreach (var userId in this.userIds)
-            {
-                userIdsArray.Add(userId);
-            }
+            var userIdsArray = new GameMatchDbAccess().GetStringFromLinkedList(this.userIds);
 
-            var bsonDoc = new BsonDocument()
-            {
-                //{"_id", new ObjectId(this.id)},
-                {"gameId", this.gameId},
-                {"date", this.date},
-                {"userIds", userIdsArray},
-                {"winnerId", this.winnerId}
-            };
+            var bsonDoc = "{" +
+                "\"_id\": \"" + this.id + "\"," +
+                "\"gameId\": \"" + this.gameId + "\"," +
+                "\"date\": \"" + this.date + "\"," +
+                "\"userIds\": \"" + userIdsArray + "\"," +
+                "\"winnerId\": \"" + this.winnerId + "\"}";
 
             return bsonDoc;
         }
