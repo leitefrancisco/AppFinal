@@ -26,6 +26,7 @@ namespace AppFinal.Models
         public LinkedList<string> friends { get; }
         public LinkedList<string> achievements { get; }
         public LinkedList<string> friendsRequest { get; private set; }
+        
 
         /// <summary>
         /// Instantiate existing user
@@ -257,6 +258,27 @@ namespace AppFinal.Models
             }
 
             AddAchievementPoints(pointsToAdd);
+        }
+
+        public async Task<int> GetVictories()
+        {
+            var victories = 0;
+
+            var matches = await GetGameMatches();
+            foreach (var match in matches)
+            {
+                if (match.winnerId.Equals(this.id))
+                {
+                    victories++;
+                }
+            }
+
+            return victories;
+        }
+
+        public async Task<LinkedList<GameMatch>> GetGameMatches()
+        {
+            return await new GameMatchDbAccess().GetUserGameMatches(this.id);
         }
 
         /// <summary>

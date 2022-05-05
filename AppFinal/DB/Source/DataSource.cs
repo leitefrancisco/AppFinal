@@ -65,7 +65,7 @@ namespace AppFinal.DB.Source
         /// <returns>List of BsonDocuments</returns>
         public async Task<List<BsonDocument>> FindAll(string collection)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path +"find/"+ collection);
             //request.Content = new StringContent("{\"region\": \"Taubate\"}", Encoding.UTF8, "application/json");
 
             var responseMessage = await this._httpClient.SendAsync(request);
@@ -92,7 +92,7 @@ namespace AppFinal.DB.Source
         /// <returns>List of BsonDocument that match the filter</returns>
         public async Task<List<BsonDocument>> FindMany(string collection, string filter)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path+"find/" + collection);
             request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
 
             var responseMessage = await this._httpClient.SendAsync(request);
@@ -118,11 +118,13 @@ namespace AppFinal.DB.Source
         /// <returns>single BsonDocument</returns>
         public async Task<BsonDocument> FindOne(string collection, string filter)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection);
+
+            Console.WriteLine("FIND ONE COMECA AQUIII");
+            var request = new HttpRequestMessage(HttpMethod.Get, this.path + "find/" + collection);
             request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
             Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);
-
+            Console.WriteLine("Response Message " + responseMessage);
             var response = await responseMessage.Content.ReadAsStringAsync();
             Console.WriteLine("response: " + response);
             JsonDocument json = JsonDocument.Parse(response);
@@ -146,7 +148,7 @@ namespace AppFinal.DB.Source
         /// <returns>single BsonDocument</returns>
         public async Task<BsonDocument> FindOne(string collection, ObjectId objId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path + collection + "/" + objId);
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path + collection + "/" + objId);
             request.Content = new StringContent("{}", Encoding.UTF8, "application/json");
             //Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);

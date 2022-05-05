@@ -18,9 +18,8 @@ namespace AppFinal.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            // Create your application here
         }
-        //check if the game is installed in the phone
+        //check if the game is installed in the phone if so, starts the app, otherwise opens PlayStore to download the game
         public void OpenGame(string game)
         {
             

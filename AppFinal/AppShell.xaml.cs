@@ -1,4 +1,7 @@
-﻿using AppFinal.Views;
+﻿using System;
+using System.Runtime.CompilerServices;
+using AppFinal.Cash;
+using AppFinal.Views;
 using Xamarin.Forms;
 
 namespace AppFinal
@@ -14,6 +17,15 @@ namespace AppFinal
             Routing.RegisterRoute(nameof(Friends), typeof(Friends));
             Routing.RegisterRoute(nameof(Registration), typeof(Registration));
             Routing.RegisterRoute(nameof(Profile),typeof(Profile));
+        }
+
+       
+        private void CheckLogin()
+        {
+            if (CurrentUser.GetUser() != null)
+            {
+
+            }
         }
 
     }

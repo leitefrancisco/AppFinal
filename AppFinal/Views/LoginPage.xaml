@@ -9,7 +9,7 @@
              BackgroundColor="#055052"
              Shell.FlyoutBehavior="Disabled"
              Shell.NavBarIsVisible="False"
-             Shell.TabBarIsVisible="True">
+             Shell.TabBarIsVisible="False">
 
     <ContentPage.BindingContext>
         <vm:LoginViewModel/>
