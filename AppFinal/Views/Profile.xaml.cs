@@ -1,4 +1,5 @@
-﻿using AppFinal.Cash;
+﻿using System;
+using AppFinal.Cash;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,6 +16,10 @@ namespace AppFinal.Views
             
         }
 
-        
+        public void Logout_Clicked(object sender, EventArgs eventArgs)
+        {
+            CurrentUser.LogOff();
+            AppShell.Current.GoToAsync("LoginPage");
+        }
     }
 }

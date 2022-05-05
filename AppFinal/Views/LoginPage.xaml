@@ -20,9 +20,9 @@
 
             <Image Source="indie_dark.png" WidthRequest="350"></Image>
 
-            <Entry x:Name="TxtUsername" Placeholder="Username" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
+            <Entry x:Name="TxtUsername" Placeholder="Email" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
             <Entry x:Name="TxtPassword" Placeholder="Password" IsPassword="True" TextColor="Green" PlaceholderColor="#F3F2C9"></Entry>
-            <Button
+            <Button 
                 VerticalOptions="Center"
                 Text="Login"
                 TextColor="White"

@@ -97,6 +97,8 @@ namespace AppFinal.DB.AccessClasses
         {
 
             var user = await Db.FindOne(this.CollectionName, "{\"email\": \"" + email + "\"}");
+            if (user == null)
+                return null;
             var pass = GetBytesFromString(user["password"].AsString);
             var salt = GetBytesFromString(user["salt"].AsString);
 

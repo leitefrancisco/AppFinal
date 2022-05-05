@@ -31,7 +31,7 @@ namespace AppFinal.Views
             
             if (!string.IsNullOrEmpty(TxtUsername.Text))
             {
-                await DisplayAlert("Ops!", "Username can't be empty", "OK");
+                await DisplayAlert("Ops!", "Email can't be empty", "OK");
             }
             else if (!string.IsNullOrEmpty(TxtPassword.Text))
             {
@@ -39,23 +39,37 @@ namespace AppFinal.Views
             }
             else
             {
-               
-                CurrentUser.SetUser(await User.Login("2019405@student.cct.ie", "Pass123!")) ;
-
-                Console.WriteLine(CurrentUser.GetUser());
-                if (CurrentUser.GetUser() != null)
+                try
                 {
-                    await Shell.Current.GoToAsync("Profile");
                     
+                    CurrentUser.SetUser(await User.Login("623b41f4a32d5715d61e4445@gmail.com", "Pass123!"));
 
-                    
-                    
+                    Console.WriteLine(CurrentUser.GetUser());
+                    if (CurrentUser.GetUser() != null)
+                    {
+                        await Shell.Current.GoToAsync("Profile");
+                        var friends =await CurrentUser.GetFriends();
+                        foreach (var VARIABLE in friends)
+                        {
+                            Console.WriteLine(VARIABLE);
+                        }
+
+                    }
+                    else
+                    {
+                        await DisplayAlert("Ops!", "Wrong Email or Password", "OK");
+                    }
 
                 }
-                else
+                catch (Exception exception)
                 {
-                    await DisplayAlert("Ops!", "Wrong Email or Password", "OK");
+                    
+                    Console.WriteLine(exception);
+                    
+                    throw;
+
                 }
+                
             
             }
            

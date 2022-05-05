@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using AppFinal.DB.AccessClasses;
 using AppFinal.Models;
 
 namespace AppFinal.Cash
@@ -21,6 +22,7 @@ namespace AppFinal.Cash
         public static void SetUser(User user)
         {
             _currentUser = user;
+            Console.WriteLine(user);
         }
 
         public static void LogOff()
@@ -37,6 +39,11 @@ namespace AppFinal.Cash
         public static async Task<LinkedList<GameMatch>> GetMatches()
         {
           return  await _currentUser.GetGameMatches();
+        }
+
+        public static async Task<LinkedList<User>> GetFriends()
+        {
+            return await new UserDbAccess().GetUserFriends(CurrentUser.GetUser().id);
         }
     }
 }

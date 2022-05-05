@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:AppFinal.ViewModels;assembly=AppFinal"
-             x:Class="AppFinal.Views.Profile">
+             x:Class="AppFinal.Views.Profile"
+             Shell.NavBarIsVisible="False">
     <ContentPage.BindingContext>
         <viewModels:ProfileViewModel/>
     </ContentPage.BindingContext>
@@ -14,6 +15,7 @@
 
                     <!-- <Button Grid.Row="0" Grid.Column="3" HeightRequest="56" WidthRequest="56" CornerRadius="28" BackgroundColor="#53b8bb" ImageSource="chat.png" VerticalOptions="Start" HorizontalOptions="End" Margin="0,5,0,0"></Button> -->
                     <!-- <Button Grid.Row="0" Grid.Column="3" HeightRequest="56" WidthRequest="56" CornerRadius="28" BackgroundColor="#53b8bb" ImageSource="game_white.png" VerticalOptions="Start" HorizontalOptions="Start" Margin="-40,5,0,0"></Button> -->
+                    <Button Text ="Logout" Grid.Row="0" Grid.Column="3" HeightRequest="56" WidthRequest="100" CornerRadius="32" BackgroundColor="#53b8bb" VerticalOptions="Start" HorizontalOptions="Start" Margin="-40,5,0,0" Clicked="Logout_Clicked" ></Button>
                     <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding UserName}" FontSize="30" TextColor="#055052" FontAttributes="Bold" Padding="20,10,0,0"/>
                     <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Region:" FontSize="18" TextColor="#8e989e" Padding="20,-5,0,0"/>
                     <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding UserRegion}" FontSize="18" TextColor="#8e989e" Padding="20,-5,0,0"/>
