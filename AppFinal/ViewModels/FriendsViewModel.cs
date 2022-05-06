@@ -1,9 +1,10 @@
-﻿    using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
-    using AppFinal.Cash;
-    using AppFinal.Models;
+using AppFinal.Cash;
+using AppFinal.Models;
 using AppFinal.Views;
 using Xamarin.Forms;
 
@@ -17,21 +18,24 @@ namespace AppFinal.ViewModels
     //     public Command LoadFriendsCommand { get; }
     //     public Command AddFriendCommand { get; }
     //     public Command<Friend> FriendTapped { get; }
-    //
+    public LinkedList<User> friends { get; set; }
 
-    public string UserPicture { get; } = CurrentUser.GetUser().pictureUrl;
-    public string UserPicture2 { get; } = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fdalealbo.cl%2F__export%2F1615331541531%2Fsites%2Fdalealbo%2Fimg%2F2021%2F03%2F09%2Ffelipe-flores_1054495_crop1615331539727.jpg_497593902.jpg&f=1&nofb=1";
         public FriendsViewModel()
     {
         Title = "Friends";
-
-
+            setFriends();
 
             // Friends = new ObservableCollection<Friend>();
             // LoadFriendsCommand = new Command(async () => await ExecuteLoadFriendsCommand());
             // FriendTapped = new Command<Friend>(OnFriendSelected);
             // AddFriendCommand = new Command(OnAddFriend);
     }
+
+        private async void setFriends()
+        {
+            var friends = await CurrentUser.GetFriends();
+            this.friends = friends;
+        }
 
         // <Grid ColumnDefinitions = "*,*" Margin="10,10,10,10" >
         // <Grid.RowDefinitions>
@@ -45,18 +49,8 @@ namespace AppFinal.ViewModels
         // <Button Grid.Row="1" Grid.Column= "1" Margin= "10,0,10,20" Text= "Send Message" BackgroundColor= "#003638" ></ Button >
         // < Label BackgroundColor= "#003638" Grid.Row= "2" Grid.ColumnSpan= "2" ></ Label >
         // </ Grid >
-
-
-        public void FillFriendView()
-        {
-            
-        }
-
-
-
+        
         //methodo q cria as labels
-
-
 
         //
         //     async Task ExecuteLoadFriendsCommand()

@@ -22,7 +22,6 @@ namespace AppFinal.Cash
         public static void SetUser(User user)
         {
             _currentUser = user;
-            Console.WriteLine(user);
         }
 
         public static void LogOff()

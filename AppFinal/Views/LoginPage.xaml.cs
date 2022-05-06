@@ -48,11 +48,7 @@ namespace AppFinal.Views
                     if (CurrentUser.GetUser() != null)
                     {
                         await Shell.Current.GoToAsync("Profile");
-                        var friends =await CurrentUser.GetFriends();
-                        foreach (var VARIABLE in friends)
-                        {
-                            Console.WriteLine(VARIABLE);
-                        }
+                        
 
                     }
                     else
