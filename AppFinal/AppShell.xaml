@@ -40,6 +40,9 @@
         <Tab Title="Profile" Icon="profile.png" IsVisible="False">
             <ShellContent ContentTemplate="{DataTemplate local:Profile}" />
         </Tab>
+        <Tab Title="Friend Profile" Icon="profile.png" IsVisible="False">
+            <ShellContent ContentTemplate="{DataTemplate local:FriendProfileView}" />
+        </Tab>
         
     </TabBar>
     <ShellContent ContentTemplate="{DataTemplate local:Registration}" />

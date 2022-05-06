@@ -21,13 +21,7 @@ namespace AppFinal
         }
 
        
-        private void CheckLogin()
-        {
-            if (CurrentUser.GetUser() != null)
-            {
-
-            }
-        }
+        
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using AppFinal.Models;
 
 namespace AppFinal.Cash
@@ -18,6 +19,10 @@ namespace AppFinal.Cash
         public static User GetUser()
         {
             return _currentFriend;
+        }
+        public static async Task<LinkedList<GameMatch>> GetMatches()
+        {
+            return await _currentFriend.GetGameMatches();
         }
     }
 }

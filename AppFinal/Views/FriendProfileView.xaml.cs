@@ -12,11 +12,9 @@ namespace AppFinal.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FriendProfileView : ContentPage
     {
-        private string userID;
-        public FriendProfileView(string userID)
+        public FriendProfileView()
         {
             InitializeComponent();
-            this.userID = userID;
         }
     }
 }

@@ -44,5 +44,15 @@ namespace AppFinal.Cash
         {
             return await new UserDbAccess().GetUserFriends(CurrentUser.GetUser().id);
         }
+        public static async Task<User> GetFriend(string id)
+        {
+            foreach (var user in await GetFriends())
+            {
+                if (user.id == id)
+                    return user;
+            }
+
+            return null;
+        }
     }
 }

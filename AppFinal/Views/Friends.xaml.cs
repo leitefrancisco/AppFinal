@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml;
 using AppFinal.Cash;
 using AppFinal.Models;
 using AppFinal.ViewModels;
@@ -78,9 +79,16 @@ namespace AppFinal.Views
             {
                 Margin = new Thickness(10, 0, 10, 20),
                 Text = "See Profile",
-                BackgroundColor = Color.DarkGreen
+                BackgroundColor = Color.DarkGreen,
+                BindingContext = user.id.ToString()
             };
-            btnSeeProfile.Clicked += async (sender, args) => await Shell.Current.GoToAsync("FriendProfileView");
+            btnSeeProfile.Clicked += async (sender, args) =>
+            {
+                string data = ((Button)sender).BindingContext as string;
+                var friend =await CurrentUser.GetFriend(data);
+                CurrentFriend.SetUser(friend);
+                await AppShell.Current.GoToAsync("FriendProfileView");
+            };
 
             Grid.SetColumn(btnSeeProfile,1);
             Grid.SetRow(btnSeeProfile,1);

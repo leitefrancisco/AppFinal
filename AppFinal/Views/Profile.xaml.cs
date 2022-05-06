@@ -18,8 +18,8 @@ namespace AppFinal.Views
 
         public void Logout_Clicked(object sender, EventArgs eventArgs)
         {
-            CurrentUser.LogOff();
-            AppShell.Current.GoToAsync("LoginPage");
+            CurrentUser.LogOff(); 
+            Shell.Current.GoToAsync("LoginPage");
         }
     }
 }
