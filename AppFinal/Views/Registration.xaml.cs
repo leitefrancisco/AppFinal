@@ -12,6 +12,8 @@ namespace AppFinal.Views
             InitializeComponent();
         }
 
+
+
         private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
             Shell.Current.GoToAsync("LoginPage");

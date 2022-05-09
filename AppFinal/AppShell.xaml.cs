@@ -18,6 +18,7 @@ namespace AppFinal
             Routing.RegisterRoute(nameof(Registration), typeof(Registration));
             Routing.RegisterRoute(nameof(Profile),typeof(Profile));
             Routing.RegisterRoute(nameof(FriendProfileView), typeof(FriendProfileView));
+            Routing.RegisterRoute(nameof(MessagesView),typeof(MessagesView));
         }
 
        

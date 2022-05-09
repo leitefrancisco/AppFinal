@@ -186,9 +186,13 @@ namespace AppFinal.Models
         /// <param name="content">content of message</param>
         /// <param name="mediaUrl">url of media of message</param>
         /// <returns>success of document creation</returns>
-        public async Task<bool> SendMessage(string receiver, string content, string mediaUrl)
+        // public async Task<bool> SendMessage(string receiver, string content, string mediaUrl)
+        // {
+        //     return await MessageDbAccess.InsertOne(new Message(this.id, receiver, content, mediaUrl));
+        // }
+        public async Task<bool> SendMessage(Message message)
         {
-            return await MessageDbAccess.InsertOne(new Message(this.id, receiver, content, mediaUrl));
+            return await MessageDbAccess.InsertOne(message);
         }
 
         /// <summary>

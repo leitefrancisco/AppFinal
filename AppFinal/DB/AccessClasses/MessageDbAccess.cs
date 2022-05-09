@@ -26,7 +26,18 @@ namespace AppFinal.DB.AccessClasses
         /// <returns>LinkedList of all messages that have been sent and received</returns>
         public async Task<LinkedList<Message>> GetUserMessages(string userId)
         {
-            var filter = "{$or: {\"by\": \"" + userId + "\", \"to\": \"" + userId + "\"}";
+            var filter = "{\"$or\":[{\"by\":\""+userId+"\"},{\"to\":\""+userId+"\"}]}";
+            // {$or: [{ by}, { to}]}
+
+            var messagesBsonDocument = await Db.FindMany(this.CollectionName, filter);
+
+            return GetLinkedListFromBsonList(messagesBsonDocument);
+        }
+        public async Task<LinkedList<Message>> GetUserMessages(string userId,string friendId)
+        {
+            var filter = "{\"$or\":[{\"by\":\"" + userId + "\",\"to\":\""+friendId+"\"},{\"to\":\"" + userId + "\",\"by\":\"" + friendId + "\"}]}";
+            // {$or: [{ by}, { to}]}
+
             var messagesBsonDocument = await Db.FindMany(this.CollectionName, filter);
 
             return GetLinkedListFromBsonList(messagesBsonDocument);

@@ -48,8 +48,6 @@ namespace AppFinal.Views
                     if (CurrentUser.GetUser() != null)
                     {
                         await Shell.Current.GoToAsync("Profile");
-                        
-
                     }
                     else
                     {

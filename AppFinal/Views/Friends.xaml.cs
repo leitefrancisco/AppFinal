@@ -99,9 +99,20 @@ namespace AppFinal.Views
             var btnSendMessage = new Button
             {
                 Margin = new Thickness(10, 0, 10, 20),
-                Text = "Send a Message",
-                BackgroundColor = Color.DarkGreen
+                Text = "Messages",
+                BackgroundColor = Color.DarkGreen,
+                BindingContext = user.id.ToString()
             };
+
+            btnSendMessage.Clicked += async (sender, args) =>
+            {
+                string data = ((Button)sender).BindingContext as string;
+                var friend = await CurrentUser.GetFriend(data);
+                CurrentFriend.SetUser(friend);
+                await AppShell.Current.GoToAsync("MessagesView");
+            };
+
+
             Grid.SetColumn(btnSendMessage, 2);
             Grid.SetRow(btnSendMessage, 1);
 

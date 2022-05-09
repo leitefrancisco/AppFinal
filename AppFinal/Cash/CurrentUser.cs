@@ -54,5 +54,11 @@ namespace AppFinal.Cash
 
             return null;
         }
+
+        public static async Task<LinkedList<Message>> GetMessagesFromCurrentFriend(string friendId)
+        {
+
+            return await new MessageDbAccess().GetUserMessages(CurrentUser.GetUser().id, friendId);
+        }
     }
 }

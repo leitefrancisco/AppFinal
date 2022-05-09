@@ -13,11 +13,10 @@ namespace AppFinal.ViewModels
         public int FriendsAmt { get; } = CurrentFriend.GetUser().friends.Count;
         public int Matches { get; set; }
         public string UserRegion { get; } = CurrentFriend.GetUser().region;
-        public string teste { get; } = "teste";
 
         public FriendProfileViewModel()
         {
-            Title = " Profile";
+            Title = SetTitle();
             SetMatches();
 
         }
@@ -26,6 +25,11 @@ namespace AppFinal.ViewModels
         {
             var matches = await CurrentFriend.GetMatches();
             this.Matches = matches.Count;
+        }
+
+        private string SetTitle()
+        {
+            return UserName + "'s Profile" ;
         }
     }
 }

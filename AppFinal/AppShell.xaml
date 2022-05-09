@@ -43,6 +43,9 @@
         <Tab Title="Friend Profile" Icon="profile.png" IsVisible="False">
             <ShellContent ContentTemplate="{DataTemplate local:FriendProfileView}" />
         </Tab>
+        <Tab Title="Messages" Icon="profile.png" IsVisible="False">
+            <ShellContent ContentTemplate="{DataTemplate local:MessagesView}" />
+        </Tab>
         
     </TabBar>
     <ShellContent ContentTemplate="{DataTemplate local:Registration}" />

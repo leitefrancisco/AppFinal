@@ -98,7 +98,7 @@ namespace AppFinal.DB.Source
             var responseMessage = await this._httpClient.SendAsync(request);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
-            JsonDocument json = JsonDocument.Parse(response);
+            // JsonDocument json = JsonDocument.Parse(response);
 
             var array = BsonSerializer.Deserialize<BsonArray>(response);
             List<BsonDocument> documents = new List<BsonDocument>();
@@ -178,7 +178,7 @@ namespace AppFinal.DB.Source
         {
             Console.WriteLine(document);
             Console.WriteLine("being sent: " + JObject.Parse(document));
-            var request = new HttpRequestMessage(HttpMethod.Post, this.path + collection);
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path +"insert/"+ collection);
             request.Content = new StringContent(JObject.Parse(document).ToString(), Encoding.UTF8, "application/json");
             Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);
