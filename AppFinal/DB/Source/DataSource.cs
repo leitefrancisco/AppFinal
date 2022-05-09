@@ -65,7 +65,7 @@ namespace AppFinal.DB.Source
         /// <returns>List of BsonDocuments</returns>
         public async Task<List<BsonDocument>> FindAll(string collection)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path +"find/"+ collection);
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path +"find/"+ collection);
             //request.Content = new StringContent("{\"region\": \"Taubate\"}", Encoding.UTF8, "application/json");
 
             var responseMessage = await this._httpClient.SendAsync(request);
@@ -92,7 +92,7 @@ namespace AppFinal.DB.Source
         /// <returns>List of BsonDocument that match the filter</returns>
         public async Task<List<BsonDocument>> FindMany(string collection, string filter)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path+"find/" + collection);
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path+"find/" + collection);
             request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
 
             var responseMessage = await this._httpClient.SendAsync(request);
@@ -119,8 +119,8 @@ namespace AppFinal.DB.Source
         public async Task<BsonDocument> FindOne(string collection, string filter)
         {
 
-            Console.WriteLine("FIND ONE COMECA AQUIII");
-            var request = new HttpRequestMessage(HttpMethod.Get, this.path + "find/" + collection);
+            
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path + "find/" + collection);
             request.Content = new StringContent(filter, Encoding.UTF8, "application/json");
             Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);
@@ -148,7 +148,7 @@ namespace AppFinal.DB.Source
         /// <returns>single BsonDocument</returns>
         public async Task<BsonDocument> FindOne(string collection, ObjectId objId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, this.path + collection + "/" + objId);
+            var request = new HttpRequestMessage(HttpMethod.Post, this.path +"find/"+ collection + "/" + objId);
             request.Content = new StringContent("{}", Encoding.UTF8, "application/json");
             //Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);
@@ -216,7 +216,7 @@ namespace AppFinal.DB.Source
         /// <returns>success of update</returns>
         public async Task<bool> UpdateOne(string collection, string id, string update)
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, this.path + collection + "/" + id);
+            var request = new HttpRequestMessage(HttpMethod.Put, this.path +"update/"+ collection + "/" + id);
             request.Content = new StringContent(update, Encoding.UTF8, "application/json");
             Console.WriteLine("request: " + request.ToJson());
             var responseMessage = await this._httpClient.SendAsync(request);

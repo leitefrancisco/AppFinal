@@ -212,5 +212,10 @@ namespace AppFinal.Models
 
             return bsonDoc;
         }
+
+        public static async Task<LinkedList<Post>> GetAllPosts()
+        {
+            return await DbAccess.FindMany();
+        }
     }
 }

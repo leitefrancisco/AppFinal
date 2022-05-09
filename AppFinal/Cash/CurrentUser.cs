@@ -27,6 +27,8 @@ namespace AppFinal.Cash
         public static void LogOff()
         {
             _currentUser = null;
+            CurrentFriend._currentFriend=null;
+
         }
 
 

@@ -14,8 +14,8 @@
         <Frame HasShadow="False" CornerRadius="40" Margin="0,-50,0,0" VerticalOptions="FillAndExpand">
             <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="*,*,*" >
 
-                
-               
+
+                <Button x:Name="InteractiveBtn" Grid.Row="0" Grid.Column="3" HeightRequest="56" WidthRequest="100" CornerRadius="32" BackgroundColor="#53b8bb" VerticalOptions="Start" HorizontalOptions="Start" Margin="-40,5,0,0"/>
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding UserName}" FontSize="30" TextColor="#055052" FontAttributes="Bold" Padding="20,10,0,0"/>
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Region:" FontSize="18" TextColor="#8e989e" Padding="20,-5,0,0"/>
                 <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding UserRegion}" FontSize="18" TextColor="#8e989e" Padding="20,-5,0,0"/>

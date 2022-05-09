@@ -132,7 +132,7 @@ namespace AppFinal.Views
 
         private void Button_OnClicked(object sender, EventArgs e)
         {
-            if (Message.Text != null && Message.Text.Trim() != "")
+            if (!String.IsNullOrEmpty(Message.Text))
             {
                 var message = new Message(currentUser.id, currentFriend.id, Message.Text, null);
 

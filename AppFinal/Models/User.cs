@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using AppFinal.DB.AccessClasses;
 using MongoDB.Bson;
@@ -109,6 +111,7 @@ namespace AppFinal.Models
         {
             this.friends.AddLast(userId);
             var newFriend = await DbAccess.FindOne(userId);
+            this.friendsRequest.Remove(userId);
             newFriend.friends.AddLast(this.id);
             await newFriend.Update();
             return await Update();
@@ -201,9 +204,11 @@ namespace AppFinal.Models
         /// <param name="content">post content</param>
         /// <param name="mediaUrl">url of media of post</param>
         /// <returns>success of document creation</returns>
-        public async Task<bool> Post(string content, string mediaUrl)
+        public async Task<Post> Post(string content, string mediaUrl)
         {
-            return await PostDbAccess.InsertOne(new Post(this.id, content, mediaUrl));
+            var newPost = new Post(this.id, content, mediaUrl);
+            await PostDbAccess.InsertOne(newPost);
+            return newPost;
         }
 
         /// <summary>
@@ -415,6 +420,20 @@ namespace AppFinal.Models
                           "\"achievements\": " + achievementsArray + "}";
 
             return bsonDoc;
+        }
+
+        public async Task<LinkedList<User>> GetFriendRequests()
+        {
+            var users = new LinkedList<User>();
+            
+            foreach (var id in friendsRequest)
+            {
+                users.AddLast(await DbAccess.FindOne(id));
+            }
+            
+
+
+            return users;
         }
     }
 }
