@@ -18,7 +18,7 @@ namespace AppFinal.Cash
                 return true;
             return false;
         }
-
+      
         public static void SetUser(User user)
         {
             _currentUser = user;
