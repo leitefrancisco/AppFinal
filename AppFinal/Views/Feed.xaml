@@ -10,23 +10,23 @@
     </ContentPage.BindingContext>
 
     <ContentPage.Content>
-        
+
         <Grid>
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="600"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <Grid Padding="5">
-            <Image Source="indie" BackgroundColor="White"
+                <Image Source="indie" BackgroundColor="White"
                     Grid.Row="0" Grid.ColumnSpan="3" />
-            <Button Grid.Column="2"  FontSize="10" Text="More Posts" BackgroundColor="#003638" Clicked="RefreshPosts"></Button>
+                <Button Grid.Column="2"  FontSize="10" Text="More Posts" BackgroundColor="#003638" Clicked="BtnRefreshPosts"></Button>
             </Grid>
 
             <ScrollView Grid.Row="1" >
                 <StackLayout x:Name="MainLayout" >
-                    
+                    <!-- template for the view -->
                     <!-- -->
                     <!-- <Grid  Margin="10,0,10,0" BackgroundColor="LightGray" Padding="10,10,10,10" >  -->
                     <!--     <Grid.RowDefinitions> -->
@@ -59,14 +59,9 @@
                     CornerRadius="50"
                     Grid.Column="5"
                     Clicked="Button_Post">
-
-
                 </Button>
             </Grid>
-
-
-
         </Grid>
-       
+
     </ContentPage.Content>
 </ContentPage>

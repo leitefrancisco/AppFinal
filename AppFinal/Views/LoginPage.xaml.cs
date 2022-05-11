@@ -25,15 +25,19 @@ namespace AppFinal.Views
             this.BindingContext = new LoginViewModel();
         }
         
-
-        private async void Button_Clicked(object sender, EventArgs e)
+        /// <summary>
+        /// executes the login and alert the user if the credentials are not correct
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Btn_Login(object sender, EventArgs e)
         {
             
-            if (!string.IsNullOrEmpty(TxtUsername.Text))
+            if (string.IsNullOrEmpty(TxtUsername.Text))
             {
                 await DisplayAlert("Ops!", "Email can't be empty", "OK");
             }
-            else if (!string.IsNullOrEmpty(TxtPassword.Text))
+            else if (string.IsNullOrEmpty(TxtPassword.Text))
             {
                 await DisplayAlert("Ops!", "Password can't be empty", "OK");
             }
@@ -42,7 +46,7 @@ namespace AppFinal.Views
                 try
                 {
                     
-                    CurrentUser.SetUser(await User.Login("623b41f4a32d5715d61e4445@gmail.com", "Pass123!"));
+                    CurrentUser.SetUser(await User.Login(TxtUsername.Text.ToLower().Trim(), TxtPassword.Text));
 
                     Console.WriteLine(CurrentUser.GetUser());
                     if (CurrentUser.GetUser() != null)
@@ -68,6 +72,11 @@ namespace AppFinal.Views
             }
            
         }
+        /// <summary>
+        /// Opens the registration page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync( "Registration");

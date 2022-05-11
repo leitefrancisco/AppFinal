@@ -20,13 +20,19 @@ namespace AppFinal.ViewModels
             SetMatches();
 
         }
-
+        /// <summary>
+        /// set the matches for the current friend in his rofile
+        /// </summary>
+        /// <returns></returns>
         private async Task SetMatches()
         {
             var matches = await CurrentFriend.GetMatches();
             this.Matches = matches.Count;
         }
-
+        /// <summary>
+        /// set the title with the username
+        /// </summary>
+        /// <returns></returns>
         private string SetTitle()
         {
             return UserName + "'s Profile" ;

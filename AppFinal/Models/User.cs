@@ -28,7 +28,7 @@ namespace AppFinal.Models
         public LinkedList<string> friends { get; }
         public LinkedList<string> achievements { get; }
         public LinkedList<string> friendsRequest { get; private set; }
-        
+
 
         /// <summary>
         /// Instantiate existing user
@@ -234,7 +234,7 @@ namespace AppFinal.Models
             var pointsToAdd = achievement.achievementPoints;
             this.achievements.AddLast(achievementId);
             CheckLevelUp(pointsToAdd);
-            
+
             return await Update();
         }
 
@@ -246,7 +246,7 @@ namespace AppFinal.Models
         {
             var gap = 20;
 
-            var upLevel = (int) Math.Floor((double) (pointsToAdd / gap));
+            var upLevel = (int)Math.Floor((double)(pointsToAdd / gap));
 
             var minLevel = this.accountLevel * gap;
             var difference = this.achievementPoints - minLevel;
@@ -259,7 +259,7 @@ namespace AppFinal.Models
             }
             else
             {
-                upLevel = (int) Math.Floor((double) ((pointsToAdd + difference) / gap));
+                upLevel = (int)Math.Floor((double)((pointsToAdd + difference) / gap));
                 for (int i = 0; i < upLevel; i++)
                 {
                     this.AccountLevelUp();
@@ -421,16 +421,19 @@ namespace AppFinal.Models
 
             return bsonDoc;
         }
-
+        /// <summary>
+        /// get all the users that request friendship in the app
+        /// </summary>
+        /// <returns>User LinkedList</returns>
         public async Task<LinkedList<User>> GetFriendRequests()
         {
             var users = new LinkedList<User>();
-            
+
             foreach (var id in friendsRequest)
             {
                 users.AddLast(await DbAccess.FindOne(id));
             }
-            
+
 
 
             return users;

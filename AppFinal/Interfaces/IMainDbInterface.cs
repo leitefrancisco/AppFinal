@@ -53,6 +53,6 @@ namespace AppFinal.Interfaces
         /// <param name="obj">Object to create document in DB for</param>
         /// <returns>Success of insertion</returns>
         public Task<bool> InsertOne(T obj);
-        
+
     }
 }

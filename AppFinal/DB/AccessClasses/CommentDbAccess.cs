@@ -30,8 +30,8 @@ namespace AppFinal.DB.AccessClasses
 
             var filter = "{\"postId\": \"" + postId + "\"}";
 
-        var bsonComments = await Db.FindMany(this.CollectionName, filter); 
-            
+            var bsonComments = await Db.FindMany(this.CollectionName, filter);
+
             foreach (var bsonComment in bsonComments)
             {
                 comments.AddLast(GetCommentFromBsonDocument(bsonComment));

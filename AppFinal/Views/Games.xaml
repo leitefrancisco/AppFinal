@@ -9,8 +9,7 @@
     </ContentPage.BindingContext>
 
     <ContentPage.Content>
-        <StackLayout Spacing="20" 
-                     Margin="20,20,20,0" Padding="15,20">
+        <StackLayout Spacing="20" Margin="20,20,20,0" Padding="15,20">
 
             <Label TextColor="#055052" FontSize="20" Text="Games Available:" TextDecorations="Underline"/>
             <Button

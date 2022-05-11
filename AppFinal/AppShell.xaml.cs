@@ -10,6 +10,7 @@ namespace AppFinal
     {
         public AppShell()
         {
+            //registering all routes for all views
             InitializeComponent();
             Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
             Routing.RegisterRoute(nameof(Feed), typeof(Feed));

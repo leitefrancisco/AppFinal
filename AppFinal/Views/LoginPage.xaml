@@ -30,7 +30,7 @@
                 BorderColor="#F3F2C9"
                 BorderWidth="1.5"
                 CornerRadius="50"
-                Clicked="Button_Clicked" >
+                Clicked="Btn_Login" >
             </Button>
 
             <Label HorizontalOptions="Center">

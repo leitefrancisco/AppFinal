@@ -19,7 +19,10 @@ namespace AppFinal.Views
             InitializeComponent();
             FillGridAllFriends();
         }
-
+        /// <summary>
+        /// fill the fiew with all the friends and friend requests
+        /// </summary>
+        /// <returns></returns>
         public async Task FillGridAllFriends()
         {
             var userRequests = await CurrentUser.GetUser().GetFriendRequests();
@@ -33,7 +36,10 @@ namespace AppFinal.Views
                 FillFriendGrid(user);
             }
         }
-
+        /// <summary>
+        ///creates a grid with a friend with buttons to send message or view profile
+        /// </summary>
+        /// <param name="user"></param>
         public void FillFriendGrid(User user)
         {
             //creates a grid and its definitions
@@ -45,7 +51,7 @@ namespace AppFinal.Views
             var rDef1 = new RowDefinition();
             var rDef2 = new RowDefinition();
             var rDef3 = new RowDefinition();
-            
+
             rDef1.Height = GridLength.Auto;
             rDef2.Height = GridLength.Auto;
             rDef3.Height = GridLength.Auto;
@@ -53,7 +59,7 @@ namespace AppFinal.Views
             newGrid.RowDefinitions.Add(rDef1);
             newGrid.RowDefinitions.Add(rDef2);
             newGrid.RowDefinitions.Add(rDef3);
-            
+
             //add the image
             var image = new Image
             {
@@ -62,10 +68,10 @@ namespace AppFinal.Views
                 HeightRequest = 200,
                 WidthRequest = 200
             };
-            
-            Grid.SetRowSpan(image,2);
-            Grid.SetRow(image,0);
-            Grid.SetColumn(image,0);
+
+            Grid.SetRowSpan(image, 2);
+            Grid.SetRow(image, 0);
+            Grid.SetColumn(image, 0);
 
             newGrid.Children.Add(image);
 
@@ -92,13 +98,13 @@ namespace AppFinal.Views
             btnSeeProfile.Clicked += async (sender, args) =>
             {
                 string data = ((Button)sender).BindingContext as string;
-                var friend =await CurrentUser.GetFriend(data);
+                var friend = await CurrentUser.GetFriend(data);
                 CurrentFriend.SetUser(friend);
                 await AppShell.Current.GoToAsync("FriendProfileView");
             };
 
-            Grid.SetColumn(btnSeeProfile,1);
-            Grid.SetRow(btnSeeProfile,1);
+            Grid.SetColumn(btnSeeProfile, 1);
+            Grid.SetRow(btnSeeProfile, 1);
 
             newGrid.Children.Add(btnSeeProfile);
 
@@ -132,14 +138,18 @@ namespace AppFinal.Views
             };
             btnSeeProfile.BackgroundColor = Color.FromHex("#003638");
             Grid.SetRow(separator, 3);
-            Grid.SetColumnSpan(separator,3);
+            Grid.SetColumnSpan(separator, 3);
 
             newGrid.Children.Add(separator);
-              
+
 
             MainLayout.Children.Add(newGrid);
 
         }
+        /// <summary>
+        /// creates a grid with a friend request with buttons to accept or decline
+        /// </summary>
+        /// <param name="user"></param>
         public void FillRequestGrid(User user)
         {
             //creates a grid and its definitions
@@ -181,13 +191,13 @@ namespace AppFinal.Views
             var labelUsername = new Label
             {
                 FontSize = 15,
-                Text = "NEW FRIEND REQUEST FROM "+user.username,
+                Text = "NEW FRIEND REQUEST FROM " + user.username,
                 Margin = new Thickness(10, 50, 20, 20)
             };
             Grid.SetColumn(labelUsername, 1);
-            Grid.SetColumnSpan(labelUsername,2);
+            Grid.SetColumnSpan(labelUsername, 2);
             Grid.SetRow(labelUsername, 0);
-            Grid.SetRowSpan(labelUsername,2);
+            Grid.SetRowSpan(labelUsername, 2);
 
             newGrid.Children.Add(labelUsername);
             var position = MainLayout.Children.Count + 1;

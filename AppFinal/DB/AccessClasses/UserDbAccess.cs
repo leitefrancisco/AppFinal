@@ -44,7 +44,7 @@ namespace AppFinal.DB.AccessClasses
             Console.WriteLine("hash: " + Convert.ToBase64String(hashed));
 
             var bson = user.GetJsonDocument();
-            
+
             bson = bson.Substring(0, bson.Length - 1);
             bson += ", \"password\": \"" + Convert.ToBase64String(hashed) + "\",";
             bson += "\"salt\": \"" + Convert.ToBase64String(salt) + "\"}";
@@ -132,10 +132,10 @@ namespace AppFinal.DB.AccessClasses
 
             var salt = GenerateRandomSalt();
             var hashed = new Rfc2898DeriveBytes(newPassword, salt).GetBytes(64);
-            
-            var update = "\"{$set\": {\"salt\": \"" + salt +"\", \"password\": \"" + hashed + "\"}";
 
-            return await Db.UpdateOne(this.CollectionName,"{ \"_id\": \"" + new ObjectId(userId) + "\"}", update) ? 2 : 1;
+            var update = "\"{$set\": {\"salt\": \"" + salt + "\", \"password\": \"" + hashed + "\"}";
+
+            return await Db.UpdateOne(this.CollectionName, "{ \"_id\": \"" + new ObjectId(userId) + "\"}", update) ? 2 : 1;
         }
 
 
@@ -148,7 +148,7 @@ namespace AppFinal.DB.AccessClasses
         {
             var filter = "{\"friends\": \"" + userId + "\"}";
             var friendsBsonDocument = await Db.FindMany(this.CollectionName, filter);
-            
+
             return GetLinkedListFromBsonList(friendsBsonDocument);
         }
 
@@ -174,7 +174,7 @@ namespace AppFinal.DB.AccessClasses
                 var region = document["region"].AsString;
                 var accountLevel = document["accountLevel"].AsInt32;
                 var achievementPoints = document["totalAchievementPoints"].AsInt32;
-                
+
                 var friends = new LinkedList<string>();
                 foreach (var friend in document["friends"].AsBsonArray)
                 {
@@ -219,16 +219,16 @@ namespace AppFinal.DB.AccessClasses
 
             var requestsArray = GetStringFromLinkedList(user.friendsRequest);
 
-            var update = "{\"$set\": {\"username\": \"" + user.username +"\"," +
-                "\"profilePicture\": \"" + user.pictureUrl +"\"," +
+            var update = "{\"$set\": {\"username\": \"" + user.username + "\"," +
+                "\"profilePicture\": \"" + user.pictureUrl + "\"," +
                 "\"email\": \"" + user.email + "\"," +
                 "\"language\": \"" + user.language + "\"," +
                 "\"region\": \"" + user.region + "\"," +
                 "\"accountLevel\": " + user.accountLevel + "," +
                 "\"totalAchievementPoints\": " + user.achievementPoints + "," +
                 "\"friends\": " + friendsArray + "," +
-                "\"achievements\": " + achievementsArray +"," +
-                "\"friendsRequest\": " + requestsArray +"}}";
+                "\"achievements\": " + achievementsArray + "," +
+                "\"friendsRequest\": " + requestsArray + "}}";
 
             return update;
         }

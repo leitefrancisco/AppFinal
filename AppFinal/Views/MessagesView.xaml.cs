@@ -18,32 +18,29 @@ namespace AppFinal.Views
     {
         private User currentUser = CurrentUser.GetUser();
         private User currentFriend = CurrentFriend.GetUser();
-        private ArrayList messagesIds = new ArrayList(); 
- 
+        private ArrayList messagesIds = new ArrayList();
+
         public MessagesView()
         {
             InitializeComponent();
             this.BackgroundImageSource = "backgroundMessages.png";
             UpdateMessages();
-
+            //repeats the method everysecond to get new messages
             Device.StartTimer(TimeSpan.FromSeconds(1), () =>
             {
                 UpdateMessages();
                 return true; // True = Repeat again, False = Stop the timer
             });
         }
-
-   
-
+        /// <summary>
+        /// get new messages from the database
+        /// </summary>
+        /// <returns></returns>
         public async Task UpdateMessages()
         {
-            
-
             var newMessages = await GetMessagesFromCurrentFriend(currentFriend.id);
             foreach (var message in newMessages)
             {
-
-                
                 if (!messagesIds.Contains(message.id))
                 {
                     FillGrid(message);
@@ -51,7 +48,10 @@ namespace AppFinal.Views
                 }
             }
         }
-        
+        /// <summary>
+        /// adds a message to the view, have different styles for the sender and the receiver.
+        /// </summary>
+        /// <param name="message"></param>
         public void FillGrid(Message message)
         {
             if (message.sender == currentUser.id)
@@ -59,7 +59,7 @@ namespace AppFinal.Views
                 var newGrid = new Grid
                 {
                     BindingContext = message.id,
-                    Margin = new Thickness(60,0,20,0)
+                    Margin = new Thickness(60, 0, 20, 0)
                 };
 
                 var rowDef = new RowDefinition
@@ -87,7 +87,7 @@ namespace AppFinal.Views
                     HorizontalTextAlignment = TextAlignment.End
                 };
 
-                Grid.SetRow(messageLabel,1);
+                Grid.SetRow(messageLabel, 1);
                 newGrid.Children.Add(messageLabel);
                 MainLayout.Children.Add(newGrid);
             }
@@ -128,20 +128,18 @@ namespace AppFinal.Views
 
             }
         }
-
-
-        private void Button_OnClicked(object sender, EventArgs e)
+        /// <summary>
+        /// sends the message to the friend and database
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnSendMessage(object sender, EventArgs e)
         {
             if (!String.IsNullOrEmpty(Message.Text))
             {
                 var message = new Message(currentUser.id, currentFriend.id, Message.Text, null);
-
-               
                 Message.Text = "";
-
                 currentUser.SendMessage(message);
-
-
             }
         }
     }

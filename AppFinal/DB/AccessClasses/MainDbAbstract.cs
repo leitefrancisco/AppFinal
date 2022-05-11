@@ -18,7 +18,7 @@ namespace AppFinal.DB.AccessClasses
 
         // Each access class for a collection has its own collection name
         protected string CollectionName { get; set; }
-        
+
         public async Task<bool> DeleteOne(string objId)
         {
             return await Db.DeleteOne(this.CollectionName, "{\"id\": \"" + objId + "\"}");
@@ -35,7 +35,7 @@ namespace AppFinal.DB.AccessClasses
             var objectsBsonDocument = await Db.FindMany(this.CollectionName, GetJsonFromDictionary(filters));
             return GetLinkedListFromBsonList(objectsBsonDocument);
         }
-        
+
         public async Task<T> FindOne(string objId)
         {
             var objectBson = await Db.FindOne(this.CollectionName, new ObjectId(objId));

@@ -73,7 +73,7 @@ namespace AppFinal.DB.AccessClasses
             var friendsArray = GetStringFromLinkedList(obj.userIds);
 
             update += "\"userIds\": " + friendsArray + "}}";
-            
+
             return update;
         }
 

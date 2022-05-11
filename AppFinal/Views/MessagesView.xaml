@@ -18,7 +18,7 @@
 
             <ScrollView Grid.Row="0" >
                 <StackLayout x:Name="MainLayout" >
-                    <!-- -->
+                    <!-- Template -->
                     <!-- <Grid Margin="20,0,60,0"> -->
                     <!--     <Grid.RowDefinitions> -->
                     <!--         <RowDefinition Height="20"/> -->
@@ -55,8 +55,6 @@
                     <!--            asdsaddsadsalorensdasdsad asdsaddsadsalorensdasdsad asdsaddsadsaasdsaddsadsalorensdasdsad -->
                     <!--            asdsaddsadsalorensdasdsad asdsaddsadsa" ></Label> -->
                     <!-- </Grid> -->
-
-                    
                 </StackLayout>
             </ScrollView>
 
@@ -71,7 +69,7 @@
                     BorderWidth="1.5"
                     CornerRadius="50"
                     Grid.Column="5"
-                    Clicked="Button_OnClicked">
+                    Clicked="BtnSendMessage">
                 </Button>
             </Grid>
 

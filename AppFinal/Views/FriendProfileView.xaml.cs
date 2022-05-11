@@ -17,8 +17,9 @@ namespace AppFinal.Views
             InitializeComponent();
             AddInteractionButton();
         }
-
-
+        /// <summary>
+        /// add the button to the view depending on the result of IsFriend Method
+        /// </summary>
         public void AddInteractionButton()
         {
             if (IsFriend()) AddMessageButton();
@@ -27,11 +28,14 @@ namespace AppFinal.Views
                 AddFriendRequestButton();
             }
         }
-
+        /// <summary>
+        /// add a button that allows the user to add the user as a friend
+        /// </summary>
+        /// <returns></returns>
         private async Task AddFriendRequestButton()
-        {   
+        {
 
-            InteractiveBtn.Text =  CurrentFriend.GetUser().friendsRequest.Contains(CurrentUser.GetUser().id) ? "Request Sent" : "Add Friend" ;
+            InteractiveBtn.Text = CurrentFriend.GetUser().friendsRequest.Contains(CurrentUser.GetUser().id) ? "Request Sent" : "Add Friend";
 
             if (InteractiveBtn.Text.Equals("Request Sent"))
             {
@@ -39,7 +43,7 @@ namespace AppFinal.Views
                 InteractiveBtn.BackgroundColor = Color.DimGray;
                 return;
             }
-            
+
             InteractiveBtn.Clicked += async (sender, args) =>
             {
                 await CurrentUser.GetUser().RequestFriendship(CurrentFriend.GetUser().id);
@@ -53,7 +57,9 @@ namespace AppFinal.Views
             };
 
         }
-
+        /// <summary>
+        /// add a button that allows the user to send a message to its friend
+        /// </summary>
         private void AddMessageButton()
         {
             InteractiveBtn.Text = "Send Message";
@@ -64,12 +70,15 @@ namespace AppFinal.Views
                 await AppShell.Current.GoToAsync("MessagesView");
             };
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if the user is already a friend of the logged user</returns>
         private bool IsFriend()
         {
             return CurrentUser.GetUser().friends.Contains(CurrentFriend.GetUser().id);
         }
 
-        
+
     }
 }

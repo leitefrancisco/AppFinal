@@ -3,15 +3,14 @@ using Android.Content;
 using Android.OS;
 using AppFinal.Droid;
 using AppFinal.Interfaces;
-
+//assembles the activity
 [assembly: Xamarin.Forms.Dependency(typeof(GameOpenerActivity))]
 
 namespace AppFinal.Droid
 {
-    // https://gist.github.com/aybarsyalcin/eb243a2274d80659e81d50bec50e1ce1
-
 
     [Activity(Label = "GameOpenerActivity")]
+    //class that implements IOpenGame interface to open the game via App
     public class GameOpenerActivity : Activity, IOpenGame
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -19,7 +18,11 @@ namespace AppFinal.Droid
             base.OnCreate(savedInstanceState);
 
         }
-        //check if the game is installed in the phone if so, starts the app, otherwise opens PlayStore to download the game
+        /// <summary>
+        /// checks if the game is installed in the phone, if so opens it , other wise send user to the PlayStore
+        ///
+        /// </summary>
+        /// <param name="game"></param>
         public void OpenGame(string game)
         {
             
@@ -32,13 +35,13 @@ namespace AppFinal.Droid
                 //starts the package
                 Android.App.Application.Context.StartActivity(intent);
             }
-            else
+            else //won't work because our game is not in PlayStore
             {
-                intent = new Intent(Intent.ActionView);
-                intent.AddFlags(ActivityFlags.NewTask);
-                //won't work because our game is not in playstore
-                intent.SetData(Android.Net.Uri.Parse($"market://details?id={game}"));
-                Android.App.Application.Context.StartActivity(intent);
+                // intent = new Intent(Intent.ActionView);
+                // intent.AddFlags(ActivityFlags.NewTask);
+                //
+                // intent.SetData(Android.Net.Uri.Parse($"market://details?id={game}"));
+                // Android.App.Application.Context.StartActivity(intent);
             }
         }
     }
